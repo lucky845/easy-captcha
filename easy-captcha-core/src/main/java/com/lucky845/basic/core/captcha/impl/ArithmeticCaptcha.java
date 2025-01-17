@@ -1,11 +1,8 @@
 package com.lucky845.basic.core.captcha.impl;
 
 import com.lucky845.basic.core.captcha.AbstractCaptcha;
-import com.lucky845.basic.core.enums.CharTypeEnum;
 import com.lucky845.basic.core.enums.ContentTypeEnum;
 import com.lucky845.basic.core.exception.CaptchaGeneratorException;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -20,9 +17,10 @@ import static com.lucky845.basic.core.utils.RandomUtils.num;
  *
  * @author created by lucky845 on 2025-01-16
  */
-@Getter
-@NoArgsConstructor
 public class ArithmeticCaptcha extends AbstractCaptcha {
+
+    public ArithmeticCaptcha() {
+    }
 
     public ArithmeticCaptcha(int width, int height) {
         this();

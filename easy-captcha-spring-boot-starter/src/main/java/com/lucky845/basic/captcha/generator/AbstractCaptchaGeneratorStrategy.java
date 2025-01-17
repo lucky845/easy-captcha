@@ -2,7 +2,6 @@ package com.lucky845.basic.captcha.generator;
 
 import com.lucky845.basic.captcha.proterties.CaptchaProperties;
 import com.lucky845.basic.core.enums.CaptchaTypeEnum;
-import com.lucky845.basic.core.model.CaptchaGeneratorDTO;
 import jakarta.annotation.Resource;
 
 import java.awt.*;

@@ -1,7 +1,5 @@
 package com.lucky845.basic.core.enums;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -11,8 +9,6 @@ import java.util.stream.Collectors;
 /**
  * @author created by lucky845 on 2025-01-16
  */
-@Getter
-@AllArgsConstructor
 public enum CharTypeEnum {
 
     /**
@@ -46,6 +42,14 @@ public enum CharTypeEnum {
     TYPE_ONLY_CAPTCHA_NUM_NUM_NUM(5),
 
     ;
+
+    CharTypeEnum(int type) {
+        this.type = type;
+    }
+
+    public int getType() {
+        return type;
+    }
 
     private final int type;
 

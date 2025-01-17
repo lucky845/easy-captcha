@@ -3,8 +3,6 @@ package com.lucky845.basic.core.captcha.impl;
 import com.lucky845.basic.core.captcha.AbstractCaptcha;
 import com.lucky845.basic.core.enums.ContentTypeEnum;
 import com.lucky845.basic.core.exception.CaptchaGeneratorException;
-import lombok.NoArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -18,8 +16,10 @@ import java.util.logging.Level;
  *
  * @author created by lucky845 on 2025-01-16
  */
-@NoArgsConstructor
 public class PngCaptcha extends AbstractCaptcha {
+
+    public PngCaptcha() {
+    }
 
     public PngCaptcha(int width, int height) {
         this();

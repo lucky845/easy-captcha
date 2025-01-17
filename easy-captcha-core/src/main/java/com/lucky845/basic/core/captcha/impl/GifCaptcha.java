@@ -1,7 +1,6 @@
 package com.lucky845.basic.core.captcha.impl;
 
 import com.lucky845.basic.core.captcha.AbstractGifCaptcha;
-import lombok.NoArgsConstructor;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -11,8 +10,11 @@ import java.awt.image.BufferedImage;
  *
  * @author created by lucky845 on 2025-01-16
  */
-@NoArgsConstructor
 public class GifCaptcha extends AbstractGifCaptcha {
+
+    public GifCaptcha() {
+
+    }
 
     public GifCaptcha(int width, int height) {
         this();

@@ -1,7 +1,5 @@
 package com.lucky845.basic.core.enums;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -11,8 +9,6 @@ import java.util.stream.Collectors;
 /**
  * @author created by lucky845 on 2025-01-16
  */
-@Getter
-@AllArgsConstructor
 public enum CaptchaTypeEnum {
 
     /**
@@ -41,6 +37,14 @@ public enum CaptchaTypeEnum {
     ARITHMETIC_CAPTCHA(4),
 
     ;
+
+    CaptchaTypeEnum(int type) {
+        this.type = type;
+    }
+
+    public int getType() {
+        return type;
+    }
 
     private final int type;
 

@@ -1,8 +1,6 @@
 package com.lucky845.basic.core.enums;
 
 import com.lucky845.basic.core.utils.RandomUtils;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 
 import java.awt.*;
 import java.util.Arrays;
@@ -15,8 +13,6 @@ import java.util.stream.Collectors;
  *
  * @author created by lucky845 on 2025-01-16
  */
-@Getter
-@AllArgsConstructor
 public enum ColorEnum {
 
     RED(new int[]{255, 0, 0}), // 红色
@@ -27,6 +23,14 @@ public enum ColorEnum {
     ORANGE(new int[]{255, 165, 0}), // 橙色
     PURPLE(new int[]{128, 0, 128}), // 紫色
     ;
+
+    ColorEnum(int[] colors) {
+        this.colors = colors;
+    }
+
+    public int[] getColors() {
+        return colors;
+    }
 
     /**
      * RGB颜色
