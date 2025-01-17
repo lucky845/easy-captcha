@@ -5,9 +5,9 @@
     <modelVersion>4.0.0</modelVersion>
     <packaging>pom</packaging>
 
-    <groupId>com.lucky845</groupId>
+    <groupId>io.github.lucky845</groupId>
     <artifactId>easy-captcha</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.0</version>
 
     <modules>
         <module>easy-captcha-core</module>
@@ -25,13 +25,17 @@
             <url>https://github.com/lucky845</url>
             <email>1447545564@qq.com</email>
             <timezone>8</timezone>
+            <roles>
+                <role>Project Manager</role>
+                <role>Architect</role>
+            </roles>
         </developer>
     </developers>
 
     <scm>
         <connection>scm:git:git@github.com:lucky845/easy-captcha.git</connection>
         <developerConnection>scm:git:git@github.com:lucky845/easy-captcha.git</developerConnection>
-        <url>git@github.com:lucky845/easy-captcha.git</url>
+        <url>https://github.com/lucky845/easy-captcha/tree/master</url>
     </scm>
 
     <licenses>
@@ -42,6 +46,7 @@
     </licenses>
 
     <properties>
+        <server.id.value>central</server.id.value>
         <!-- properties -->
         <java.version>21</java.version>
         <maven.compiler.source>21</maven.compiler.source>
@@ -56,6 +61,7 @@
         <maven.spring.boot.version>3.4.1</maven.spring.boot.version>
         <maven.versions.version>2.18.0</maven.versions.version>
         <maven.javadoc.version>3.11.2</maven.javadoc.version>
+        <maven.source.plugin.version>2.2.1</maven.source.plugin.version>
 
         <!-- dependencies version -->
         <commons-lang3.version>3.17.0</commons-lang3.version>
@@ -93,7 +99,7 @@
             </dependency>
 
             <dependency>
-                <groupId>com.lucky845</groupId>
+                <groupId>io.github.lucky845</groupId>
                 <artifactId>easy-captcha-core</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -259,19 +265,6 @@
                 </plugin>
 
                 <plugin>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-maven-plugin</artifactId>
-                    <version>${maven.spring.boot.version}</version>
-                    <executions>
-                        <execution>
-                            <goals>
-                                <goal>repackage</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
-
-                <plugin>
                     <artifactId>maven-javadoc-plugin</artifactId>
                     <version>${maven.javadoc.version}</version>
                     <executions>
@@ -302,32 +295,6 @@
         </pluginManagement>
 
         <plugins>
-
-            <plugin>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>attach-javadoc</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <!-- utf-8读取文件 -->
-                    <charset>UTF-8</charset>
-                    <!-- utf-8进行编码代码 -->
-                    <encoding>UTF-8</encoding>
-                    <!-- utf-8进行编码文档 -->
-                    <docencoding>UTF-8</docencoding>
-                    <additionalJOptions>
-                        <additionalJOption>-J-Duser.language=en</additionalJOption>
-                        <additionalJOption>-J-Duser.country=US</additionalJOption>
-                        <additionalJOption>-Xdoclint:none</additionalJOption>
-                    </additionalJOptions>
-                </configuration>
-            </plugin>
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -387,23 +354,23 @@
 
         <profile>
             <id>release</id>
+
+            <repositories>
+                <repository>
+                    <name>Central Portal Snapshots</name>
+                    <id>central-portal-snapshots</id>
+                    <url>https://central.sonatype.com/repository/maven-snapshots/</url>
+                    <releases>
+                        <enabled>false</enabled>
+                    </releases>
+                    <snapshots>
+                        <enabled>true</enabled>
+                    </snapshots>
+                </repository>
+            </repositories>
+
             <build>
                 <plugins>
-
-                    <!--   source源码插件 -->
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-source-plugin</artifactId>
-                        <version>3.3.1</version>
-                        <executions>
-                            <execution>
-                                <id>attach-sources</id>
-                                <goals>
-                                    <goal>jar-no-fork</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
 
                     <!-- Javadoc -->
                     <plugin>
@@ -424,32 +391,50 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
+                        <version>3.2.4</version>
                         <executions>
                             <execution>
+                                <id>sign-artifacts</id>
                                 <phase>verify</phase>
                                 <goals>
                                     <goal>sign</goal>
                                 </goals>
                             </execution>
                         </executions>
-                        <configuration>
-                            <gpgArguments>
-                                <arg>--pinentry-mode</arg>
-                                <arg>loopback</arg>
-                            </gpgArguments>
-                        </configuration>
+<!--                        <configuration>-->
+<!--                            <gpgArguments>-->
+<!--                                <arg>&#45;&#45;pinentry-mode</arg>-->
+<!--                                <arg>loopback</arg>-->
+<!--                            </gpgArguments>-->
+<!--                        </configuration>-->
                     </plugin>
 
-                    <!-- 发布到中央库 -->
+                    <!--用于与 center 仓库进行集成，方便在 Maven 构建过程中进行部署和发布操作-->
                     <plugin>
                         <groupId>org.sonatype.central</groupId>
                         <artifactId>central-publishing-maven-plugin</artifactId>
                         <version>0.7.0</version>
                         <extensions>true</extensions>
                         <configuration>
-                            <publishingServerId>lucky845</publishingServerId>
+                            <publishingServerId>${server.id.value}</publishingServerId>
                             <autoPublish>true</autoPublish>
+                            <checksums>required</checksums>
                         </configuration>
+                    </plugin>
+
+                    <!--Maven编译插件-->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <version>${maven.source.plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <goals>
+                                    <goal>jar-no-fork</goal>
+                                </goals>
+                            </execution>
+                        </executions>
                     </plugin>
 
                 </plugins>

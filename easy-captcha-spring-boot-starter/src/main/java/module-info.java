@@ -7,8 +7,8 @@ module easy.captcha.spring.boot.starter {
     requires spring.context;
     requires java.desktop;
 
-    exports com.lucky845.basic.captcha;
-    exports com.lucky845.basic.captcha.config;
-    exports com.lucky845.basic.captcha.generator;
-    exports com.lucky845.basic.captcha.proterties;
+    exports io.github.lucky845.basic.captcha;
+    exports io.github.lucky845.basic.captcha.config;
+    exports io.github.lucky845.basic.captcha.generator;
+    exports io.github.lucky845.basic.captcha.proterties;
 }
