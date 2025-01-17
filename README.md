@@ -31,24 +31,50 @@
 
 在 `application.properties` 或 `application.yml` 文件中，配置验证码相关的属性：
 
-```properties
-captcha.enable=true
-captcha.width=200
-captcha.height=50
+```yaml
+easy-captcha:
+  enabled: true
+  width: 200
+  height: 50
+  captcha-type: 0
+  captcha-length: 4
+  char-type: 0
+  font: 0
 ```
 
 ## 使用
 
-1. 在 Spring Boot 项目中启用自动配置。
+1. 使用`AbstractCaptchaGeneratorStrategy` 抽象类来配置验证码生成策略。
 
 ```java
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
+import io.github.lucky845.basic.captcha.CaptchaService;
+import io.github.lucky845.basic.captcha.generator.AbstractCaptchaGeneratorStrategy;
+import io.github.lucky845.basic.captcha.generator.CaptchaGeneratorFactory;
+import io.github.lucky845.basic.captcha.proterties.CaptchaProperties;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.http.HttpServletResponse;
 
-@Configuration
-@EnableConfigurationProperties(CaptchaProperties.class)
-public class CaptchaConfiguration {
-    // 配置你的验证码逻辑
+@Autowired
+private final CaptchaProperties captchaProperties;
+
+@GetMapping("captcha")
+public void captcha(HttpServletResponse response) throws IOException, FontFormatException {
+    ServletOutputStream outputStream = response.getOutputStream();
+    AbstractCaptchaGeneratorStrategy strategy = CaptchaGeneratorFactory.getGenerator(captchaProperties.getCaptchaType());
+    strategy.generateCaptcha(outputStream);
+    // 此处仅打印验证码，实际使用请保存至Redis
+    logger.info(strategy.getCaptcha());
+    outputStream.flush();
+    outputStream.close();
+}
+
+@GetMapping("captchaBase64")
+public String captchaBase64() throws IOException, FontFormatException {
+    AbstractCaptchaGeneratorStrategy strategy = CaptchaGeneratorFactory.getGenerator(captchaProperties.getCaptchaType());
+    String base64Captcha = strategy.generateCaptchaBase64();
+    // 此处仅打印验证码，实际使用请保存至Redis
+    logger.info(strategy.getCaptcha());
+    return base64Captcha;
 }
 ```
 
@@ -60,9 +86,19 @@ import io.github.lucky845.basic.captcha.CaptchaService;
 @Autowired
 private CaptchaService captchaService;
 
-public void generateCaptcha() {
-    String captcha = captchaService.generateCaptcha();
-    // 处理生成的验证码
+@GetMapping("captchaNew")
+public void captchaNew(HttpServletResponse response) throws IOException, FontFormatException {
+    captchaService.generateCaptcha(response);
+    // 此处仅打印验证码，实际使用请保存至Redis
+    logger.info(captchaService.getCaptcha());
+}
+
+@GetMapping("captchaBase64New")
+public String captchaBase64New() throws IOException, FontFormatException {
+    String base64Captcha = captchaService.generateCaptchaBase64();
+    // 此处仅打印验证码，实际使用请保存至Redis
+    logger.info(captchaService.getCaptcha());
+    return base64Captcha;
 }
 ```
 

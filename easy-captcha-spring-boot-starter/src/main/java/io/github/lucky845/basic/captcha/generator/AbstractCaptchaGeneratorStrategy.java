@@ -50,4 +50,9 @@ public abstract class AbstractCaptchaGeneratorStrategy {
      */
     public abstract CaptchaTypeEnum captchaType();
 
+    /**
+     * 获取Content-Type
+     */
+    public abstract String contentType();
+
 }

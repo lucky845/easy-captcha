@@ -60,7 +60,7 @@ public enum CaptchaTypeEnum {
      *
      * @param type type
      */
-    public static CaptchaTypeEnum getType(int type) {
+    public static CaptchaTypeEnum fromType(int type) {
         return TYPE_ENUM_MAP.get(type);
     }
 

@@ -6,6 +6,7 @@ import jakarta.annotation.PostConstruct;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * @author created by lucky845 on 2025-01-17
@@ -13,7 +14,9 @@ import java.util.List;
 @Configuration
 public class CaptchaGeneratorConfig {
 
-    private List<AbstractCaptchaGeneratorStrategy> strategies;
+    private final Logger logger = Logger.getLogger(CaptchaGeneratorConfig.class.getName());
+
+    private final List<AbstractCaptchaGeneratorStrategy> strategies;
 
     public CaptchaGeneratorConfig(List<AbstractCaptchaGeneratorStrategy> strategies) {
         this.strategies = strategies;
@@ -23,6 +26,7 @@ public class CaptchaGeneratorConfig {
     public void init() {
         strategies.forEach(strategy ->
                 CaptchaGeneratorFactory.registerGenerator(strategy.captchaType(), strategy));
+        logger.info("初始化验证码策略完成！");
     }
 
 }

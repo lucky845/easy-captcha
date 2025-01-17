@@ -7,11 +7,12 @@
 
     <groupId>io.github.lucky845</groupId>
     <artifactId>easy-captcha</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.2-SNAPSHOT</version>
 
     <modules>
         <module>easy-captcha-core</module>
         <module>easy-captcha-spring-boot-starter</module>
+        <module>easy-captcha-demo</module>
     </modules>
 
     <name>${project.artifactId}</name>
@@ -54,20 +55,20 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <!-- plugins version -->
-        <maven.compiler.version>3.13.0</maven.compiler.version>
-        <maven.resource.version>3.3.1</maven.resource.version>
-        <maven.jar.version>3.4.2</maven.jar.version>
-        <maven.surefire.version>3.5.2</maven.surefire.version>
-        <maven.spring.boot.version>3.4.1</maven.spring.boot.version>
-        <maven.versions.version>2.18.0</maven.versions.version>
-        <maven.javadoc.version>3.11.2</maven.javadoc.version>
+        <maven.compiler.plugin.version>3.13.0</maven.compiler.plugin.version>
+        <maven.resource.plugin.version>3.3.1</maven.resource.plugin.version>
+        <maven.jar.plugin.version>3.4.2</maven.jar.plugin.version>
+        <maven.surefire.plugin.version>3.5.2</maven.surefire.plugin.version>
+        <maven.spring.boot.plugin.version>3.4.1</maven.spring.boot.plugin.version>
+        <maven.versions.plugin.version>2.18.0</maven.versions.plugin.version>
+        <maven.javadoc.plugin.version>3.11.2</maven.javadoc.plugin.version>
         <maven.source.plugin.version>2.2.1</maven.source.plugin.version>
+        <maven.deploy.plugin.version>3.1.3</maven.deploy.plugin.version>
 
         <!-- dependencies version -->
+        <spring-boot.version>3.3.7</spring-boot.version>
         <commons-lang3.version>3.17.0</commons-lang3.version>
         <aviator.version>5.4.3</aviator.version>
-        <autoconfigure-processor.version>3.3.7</autoconfigure-processor.version>
-        <spring-boot.version>3.4.1</spring-boot.version>
     </properties>
 
     <dependencyManagement>
@@ -75,14 +76,8 @@
 
             <dependency>
                 <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter</artifactId>
-                <version>${spring-boot.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-autoconfigure-processor</artifactId>
-                <version>${autoconfigure-processor.version}</version>
+                <version>${spring-boot.version}</version>
                 <scope>runtime</scope>
             </dependency>
 
@@ -102,6 +97,13 @@
                 <groupId>io.github.lucky845</groupId>
                 <artifactId>easy-captcha-core</artifactId>
                 <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.github.lucky845</groupId>
+                <artifactId>easy-captcha-spring-boot-starter</artifactId>
+                <version>${project.version}</version>
+                <scope>provided</scope>
             </dependency>
 
         </dependencies>
@@ -158,7 +160,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>${maven.compiler.version}</version>
+                    <version>${maven.compiler.plugin.version}</version>
                     <configuration>
                         <source>${maven.compiler.source}</source>
                         <target>${maven.compiler.target}</target>
@@ -170,7 +172,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-resources-plugin</artifactId>
-                    <version>${maven.resource.version}</version>
+                    <version>${maven.resource.plugin.version}</version>
                     <configuration>
                         <!-- 后缀为ttf的字体文件 -->
                         <nonFilteredFileExtensions>
@@ -182,7 +184,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
-                    <version>${maven.jar.version}</version>
+                    <version>${maven.jar.plugin.version}</version>
                     <configuration>
                         <archive>
                             <!-- 生成的jar中，不包含pom.xml和pom.properties这两个文件 -->
@@ -233,7 +235,7 @@
                     <!--打包跳过测试-->
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>${maven.surefire.version}</version>
+                    <version>${maven.surefire.plugin.version}</version>
                     <configuration>
                         <skipTests>true</skipTests>
                         <skip>true</skip>
@@ -258,7 +260,7 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>versions-maven-plugin</artifactId>
-                    <version>${maven.versions.version}</version>
+                    <version>${maven.versions.plugin.version}</version>
                     <configuration>
                         <generateBackupPoms>false</generateBackupPoms>
                     </configuration>
@@ -266,7 +268,7 @@
 
                 <plugin>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>${maven.javadoc.version}</version>
+                    <version>${maven.javadoc.plugin.version}</version>
                     <executions>
                         <execution>
                             <id>attach-javadoc</id>
@@ -289,6 +291,12 @@
                             <additionalJOption>-Xdoclint:none</additionalJOption>
                         </additionalJOptions>
                     </configuration>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-deploy-plugin</artifactId>
+                    <version>${maven.deploy.plugin.version}</version>
                 </plugin>
 
             </plugins>
