@@ -3,6 +3,7 @@ package io.github.lucky845.basic.captcha.generator;
 import io.github.lucky845.basic.core.captcha.impl.ArithmeticCaptcha;
 import io.github.lucky845.basic.core.enums.CaptchaTypeEnum;
 import io.github.lucky845.basic.core.exception.CaptchaGeneratorException;
+import org.springframework.stereotype.Component;
 
 import java.awt.*;
 import java.io.IOException;
@@ -11,6 +12,7 @@ import java.io.OutputStream;
 /**
  * @author created by lucky845 on 2025-01-17
  */
+@Component
 public class ArithmeticCaptchaGeneratorStrategy extends AbstractCaptchaGeneratorStrategy {
 
     private ArithmeticCaptcha captcha;
@@ -38,6 +40,11 @@ public class ArithmeticCaptchaGeneratorStrategy extends AbstractCaptchaGenerator
     @Override
     public CaptchaTypeEnum captchaType() {
         return CaptchaTypeEnum.ARITHMETIC_CAPTCHA;
+    }
+
+    @Override
+    public String contentType() {
+        return captcha.getContentType().getContentType();
     }
 
     private ArithmeticCaptcha buildArithmeticCaptcha() throws IOException, FontFormatException {

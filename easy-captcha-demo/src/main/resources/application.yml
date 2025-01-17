@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: easy-captcha-demo
+
+
+# 验证码相关配置
+easy-captcha:
+  enabled: true
+  width: 200
+  height: 50
+  captcha-type: 0
+  captcha-length: 4
+  char-type: 0
+  font: 0

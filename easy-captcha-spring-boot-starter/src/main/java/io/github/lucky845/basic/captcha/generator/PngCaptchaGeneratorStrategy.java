@@ -3,6 +3,7 @@ package io.github.lucky845.basic.captcha.generator;
 import io.github.lucky845.basic.core.captcha.impl.PngCaptcha;
 import io.github.lucky845.basic.core.enums.CaptchaTypeEnum;
 import io.github.lucky845.basic.core.exception.CaptchaGeneratorException;
+import org.springframework.stereotype.Component;
 
 import java.awt.*;
 import java.io.IOException;
@@ -13,6 +14,7 @@ import java.io.OutputStream;
  *
  * @author created by lucky845 on 2025-01-16
  */
+@Component
 public class PngCaptchaGeneratorStrategy extends AbstractCaptchaGeneratorStrategy {
 
     private PngCaptcha captcha;
@@ -44,6 +46,11 @@ public class PngCaptchaGeneratorStrategy extends AbstractCaptchaGeneratorStrateg
     @Override
     public CaptchaTypeEnum captchaType() {
         return CaptchaTypeEnum.PNG_CAPTCHA;
+    }
+
+    @Override
+    public String contentType() {
+        return captcha.getContentType().getContentType();
     }
 
     private PngCaptcha buildPngCaptcha() throws IOException, FontFormatException {

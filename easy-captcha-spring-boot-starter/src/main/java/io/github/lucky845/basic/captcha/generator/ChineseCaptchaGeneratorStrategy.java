@@ -3,6 +3,7 @@ package io.github.lucky845.basic.captcha.generator;
 import io.github.lucky845.basic.core.captcha.impl.ChineseCaptcha;
 import io.github.lucky845.basic.core.enums.CaptchaTypeEnum;
 import io.github.lucky845.basic.core.exception.CaptchaGeneratorException;
+import org.springframework.stereotype.Component;
 
 import java.awt.*;
 import java.io.IOException;
@@ -11,6 +12,7 @@ import java.io.OutputStream;
 /**
  * @author created by lucky845 on 2025-01-17
  */
+@Component
 public class ChineseCaptchaGeneratorStrategy extends AbstractCaptchaGeneratorStrategy {
 
     private ChineseCaptcha captcha;
@@ -38,6 +40,11 @@ public class ChineseCaptchaGeneratorStrategy extends AbstractCaptchaGeneratorStr
     @Override
     public CaptchaTypeEnum captchaType() {
         return CaptchaTypeEnum.CHINESE_CAPTCHA;
+    }
+
+    @Override
+    public String contentType() {
+        return captcha.getContentType().getContentType();
     }
 
     private ChineseCaptcha buildChineseCaptcha() throws IOException, FontFormatException {

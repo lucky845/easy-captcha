@@ -27,4 +27,9 @@ public class CaptchaGeneratorFactory {
         return Optional.ofNullable(strategy).orElseThrow(() -> new NoSuchStrategyException("未找到对应的验证码策略，请修改配置后重试！"));
     }
 
+    public static AbstractCaptchaGeneratorStrategy getGenerator(int captchaType) {
+        AbstractCaptchaGeneratorStrategy strategy = CAPTCHA_GENERATOR_MAP.get(CaptchaTypeEnum.fromType(captchaType));
+        return Optional.ofNullable(strategy).orElseThrow(() -> new NoSuchStrategyException("未找到对应的验证码策略，请修改配置后重试！"));
+    }
+
 }
