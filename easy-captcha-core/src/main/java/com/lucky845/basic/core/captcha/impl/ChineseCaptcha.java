@@ -3,7 +3,6 @@ package com.lucky845.basic.core.captcha.impl;
 import com.lucky845.basic.core.captcha.AbstractCaptcha;
 import com.lucky845.basic.core.enums.ContentTypeEnum;
 import com.lucky845.basic.core.exception.CaptchaGeneratorException;
-import lombok.NoArgsConstructor;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -16,8 +15,10 @@ import java.io.OutputStream;
  *
  * @author created by lucky845 on 2025-01-16
  */
-@NoArgsConstructor
 public class ChineseCaptcha extends AbstractCaptcha {
+
+    public ChineseCaptcha() {
+    }
 
     public ChineseCaptcha(int width, int height) {
         this();

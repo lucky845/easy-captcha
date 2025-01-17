@@ -6,7 +6,6 @@ import com.lucky845.basic.core.enums.ColorEnum;
 import com.lucky845.basic.core.enums.FontEnum;
 import com.lucky845.basic.core.exception.CaptchaGeneratorException;
 import com.lucky845.basic.core.utils.RandomUtils;
-import lombok.Data;
 
 import java.awt.*;
 import java.awt.geom.CubicCurve2D;
@@ -25,7 +24,6 @@ import static com.lucky845.basic.core.utils.RandomUtils.num;
  *
  * @author created by lucky845 on 2025-01-16
  */
-@Data
 public abstract class AbstractCaptcha implements Captcha {
 
     protected Logger logger = Logger.getLogger(this.getClass().getName());
@@ -59,6 +57,10 @@ public abstract class AbstractCaptcha implements Captcha {
      * 验证码显示高度
      */
     protected int captchaHeight;
+
+    public AbstractCaptcha() {
+
+    }
 
     /**
      * 给定范围获得随机颜色
@@ -323,5 +325,43 @@ public abstract class AbstractCaptcha implements Captcha {
         }
     }
 
+    public Logger getLogger() {
+        return logger;
+    }
 
+    public void setLogger(Logger logger) {
+        this.logger = logger;
+    }
+
+    public CharTypeEnum getCharType() {
+        return charType;
+    }
+
+    public void setCharType(CharTypeEnum charType) {
+        this.charType = charType;
+    }
+
+    public int getCaptchaLength() {
+        return captchaLength;
+    }
+
+    public void setCaptchaLength(int captchaLength) {
+        this.captchaLength = captchaLength;
+    }
+
+    public int getCaptchaWidth() {
+        return captchaWidth;
+    }
+
+    public void setCaptchaWidth(int captchaWidth) {
+        this.captchaWidth = captchaWidth;
+    }
+
+    public int getCaptchaHeight() {
+        return captchaHeight;
+    }
+
+    public void setCaptchaHeight(int captchaHeight) {
+        this.captchaHeight = captchaHeight;
+    }
 }

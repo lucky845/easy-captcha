@@ -1,8 +1,5 @@
 package com.lucky845.basic.core.enums;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-
 import java.util.Arrays;
 import java.util.Map;
 import java.util.function.Function;
@@ -13,8 +10,6 @@ import java.util.stream.Collectors;
  *
  * @author created by lucky845 on 2025-01-16
  */
-@Getter
-@AllArgsConstructor
 public enum FontEnum {
 
     PREFIX(0, "fonts/prefix.ttf"),
@@ -26,7 +21,21 @@ public enum FontEnum {
     IEXO(6, "fonts/iexo.ttf"),
     ACTIONJ(7, "fonts/actionj.ttf"),
     EPLIOG(8, "fonts/epliog.ttf"),
-    FRESNEL(9, "fonts/fresnel.ttf");
+    FRESNEL(9, "fonts/fresnel.ttf"),
+    ;
+
+    FontEnum(int type, String path) {
+        this.type = type;
+        this.path = path;
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public String getPath() {
+        return path;
+    }
 
     // 字体类型
     private final int type;
