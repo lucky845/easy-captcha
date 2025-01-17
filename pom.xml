@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <packaging>pom</packaging>
+
+    <groupId>com.lucky845</groupId>
+    <artifactId>easy-captcha</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+    <name>${project.artifactId}</name>
+    <description>依赖管理</description>
+
+    <modules>
+        <module>easy-captcha-core</module>
+        <module>easy-captcha-spring-boot-starter</module>
+    </modules>
+
+    <properties>
+        <!-- properties -->
+        <java.version>21</java.version>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <!-- plugins version -->
+        <maven.compiler.version>3.13.0</maven.compiler.version>
+        <maven.resource.version>3.3.1</maven.resource.version>
+        <maven.jar.version>3.4.2</maven.jar.version>
+        <maven.surefire.version>3.5.2</maven.surefire.version>
+        <maven.spring.boot.version>3.4.1</maven.spring.boot.version>
+        <maven.versions.version>2.18.0</maven.versions.version>
+
+        <!-- dependencies version -->
+        <lombok.version>1.18.36</lombok.version>
+        <commons-lang3.version>3.17.0</commons-lang3.version>
+        <aviator.version>5.4.3</aviator.version>
+        <autoconfigure-processor.version>3.3.7</autoconfigure-processor.version>
+        <spring-boot.version>3.4.1</spring-boot.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter</artifactId>
+                <version>${spring-boot.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-autoconfigure-processor</artifactId>
+                <version>${autoconfigure-processor.version}</version>
+                <scope>runtime</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.googlecode.aviator</groupId>
+                <artifactId>aviator</artifactId>
+                <version>${aviator.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>${commons-lang3.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombok.version}</version>
+                <scope>compile</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.lucky845</groupId>
+                <artifactId>easy-captcha-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+        </dependencies>
+    </dependencyManagement>
+
+    <repositories>
+        <repository>
+            <id>aliyun</id>
+            <url>https://maven.aliyun.com/repository/public</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>aliyun-plugin</id>
+            <url>https://maven.aliyun.com/repository/public</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </pluginRepository>
+    </pluginRepositories>
+
+    <build>
+        <finalName>${project.artifactId}</finalName>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>**/*</include>
+                </includes>
+                <filtering>true</filtering>
+            </resource>
+            <resource>
+                <directory>src/main/java</directory>
+                <includes>
+                    <include>**/*.xml</include>
+                </includes>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+
+        <pluginManagement>
+            <plugins>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${maven.compiler.version}</version>
+                    <configuration>
+                        <source>${maven.compiler.source}</source>
+                        <target>${maven.compiler.target}</target>
+                        <encoding>${project.build.sourceEncoding}</encoding>
+                    </configuration>
+                </plugin>
+
+                <!-- 资源插件 -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>${maven.resource.version}</version>
+                    <configuration>
+                        <!-- 后缀为ttf的字体文件 -->
+                        <nonFilteredFileExtensions>
+                            <nonFilteredFileExtension>ttf</nonFilteredFileExtension>
+                        </nonFilteredFileExtensions>
+                    </configuration>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>${maven.jar.version}</version>
+                    <configuration>
+                        <archive>
+                            <!-- 生成的jar中，包含pom.xml和pom.properties这两个文件 -->
+                            <addMavenDescriptor>true</addMavenDescriptor>
+                            <!-- 生成MANIFEST.MF的设置 -->
+                            <manifest>
+                                <!--这个属性特别关键，如果没有这个属性，有时候我们引用的包maven库
+                                下面可能会有多个包，并且只有一个是正确的，其余的可能是带时间戳的，
+                                此时会在classpath下面把那个带时间戳的给添加上去，
+                                然后我们 在依赖打包的时候，打的是正确的，所以两头会对不上，报错。 -->
+                                <useUniqueVersions>false</useUniqueVersions>
+                                <!-- 为依赖包添加路径, 这些路径会写在MANIFEST文件的Class-Path下 -->
+                                <addClasspath>true</addClasspath>
+                                <!-- 这个jar所依赖的jar包添加classPath的时候的前缀，如果这个jar本身
+                                和依赖包在同一级目录，则不需要添加 -->
+                                <classpathPrefix>lib/</classpathPrefix>
+                                <!-- jar启动入口类 -->
+                                <mainClass>com.ht.pojo.Test</mainClass>
+                            </manifest>
+                            <manifestEntries>
+                                <!-- 在Class-Path下添加配置文件的路径 -->
+                                <Class-Path>../config/</Class-Path>
+                                <!-- 假如这个项目可能要引入一些外部资源，但是你打包的时候并不想把
+                                这些资源文件打进包里面，这个时候你必须在这边额外指定一些这些资源
+                                文件的路径，这个位置指定的话，要根据你预期的这些位置去设置，我这边
+                                所有jar都在lib下，资源文件都在config下，lib和config是同级的
+                                同时还需要注意另外一个问题，假如你的pom文件里面配置了
+                                <scope>system</scope>,就是你依赖是你本地的资源，这个时候使用
+                                这个插件，classPath里面是不会添加，所以你得手动把这个依赖添加进
+                                这个地方，用空格隔开就行 -->
+                            </manifestEntries>
+                        </archive>
+                        <!-- jar包的位置 -->
+                        <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                        <includes>
+                            <!-- 打jar包时，打包class文件和config目录下面的 properties文件 -->
+                            <!-- 有时候可能需要一些其他文件，这边可以配置，包括剔除的文件等等 -->
+                            <include>**/*.class</include>
+                            <include>**/*.properties</include>
+                        </includes>
+                    </configuration>
+                </plugin>
+
+                <plugin>
+                    <!--打包跳过测试-->
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>${maven.surefire.version}</version>
+                    <configuration>
+                        <skipTests>true</skipTests>
+                        <skip>true</skip>
+                    </configuration>
+                </plugin>
+
+                <!-- 一键更新子模块版本号 使用方法如下: -->
+                <!-- # 显示所有的依赖更新-->
+                <!-- mvn versions:display-dependency-updates-->
+                <!-- # 显示项目的插件更新-->
+                <!-- mvn versions:display-plugin-updates-->
+                <!-- # 显示项目的属性更新-->
+                <!-- mvn versions:display-property-updates-->
+                <!-- # 设置项目版本号-->
+                <!-- mvn versions:set -DnewVersion=1.0.1-SNAPSHOT -DgenerateBackupPoms=true-->
+                <!-- # 设置属性版本号-->
+                <!-- mvn versions:set-property -Dproperty=tsollu.version -DnewVersion=1.0.1-SNAPSHOT -DgenerateBackupPoms=true-->
+                <!-- # 移除 pom.xml.versionsBackup 备份文件-->
+                <!-- mvn versions:commit-->
+                <!-- # 基于 pom.xml.versionsBackup 备份文件回滚-->
+                <!-- mvn versions:revert-->
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>versions-maven-plugin</artifactId>
+                    <version>${maven.versions.version}</version>
+                    <configuration>
+                        <generateBackupPoms>false</generateBackupPoms>
+                    </configuration>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-maven-plugin</artifactId>
+                    <version>${maven.spring.boot.version}</version>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>repackage</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+
+            </plugins>
+        </pluginManagement>
+
+        <plugins>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+            </plugin>
+
+            <plugin>
+                <!--打包跳过测试-->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+            </plugin>
+
+            <!-- 资源插件 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+            </plugin>
+
+            <!-- 一键更新子模块版本号 -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>versions-maven-plugin</artifactId>
+                <configuration>
+                    <generateBackupPoms>false</generateBackupPoms>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
