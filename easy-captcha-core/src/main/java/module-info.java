@@ -8,7 +8,6 @@ module easy.captcha.core {
     exports io.github.lucky845.basic.core.constants;
     exports io.github.lucky845.basic.core.utils;
     exports io.github.lucky845.basic.core.exception;
-    exports io.github.lucky845.basic.core.model;
     exports io.github.lucky845.basic.core.captcha.impl;
     exports io.github.lucky845.basic.core.encoder;
 }
