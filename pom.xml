@@ -7,7 +7,7 @@
 
     <groupId>io.github.lucky845</groupId>
     <artifactId>easy-captcha</artifactId>
-    <version>1.0.2</version>
+    <version>1.0.3-SNAPSHOT</version>
 
     <modules>
         <module>easy-captcha-core</module>
