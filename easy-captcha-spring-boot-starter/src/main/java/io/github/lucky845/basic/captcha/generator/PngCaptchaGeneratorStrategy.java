@@ -2,7 +2,9 @@ package io.github.lucky845.basic.captcha.generator;
 
 import io.github.lucky845.basic.core.captcha.impl.PngCaptcha;
 import io.github.lucky845.basic.core.enums.CaptchaTypeEnum;
+import io.github.lucky845.basic.core.enums.ContentTypeEnum;
 import io.github.lucky845.basic.core.exception.CaptchaGeneratorException;
+import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Component;
 
 import java.awt.*;
@@ -19,13 +21,22 @@ public class PngCaptchaGeneratorStrategy extends AbstractCaptchaGeneratorStrateg
 
     private PngCaptcha captcha;
 
+    @PostConstruct
+    private void init() throws IOException, FontFormatException {
+        captcha = new PngCaptcha();
+        captcha.setFont(captchaProperties.getFont());
+        captcha.setCharType(captchaProperties.getCharType());
+        captcha.setCaptchaWidth(captchaProperties.getWidth());
+        captcha.setCaptchaHeight(captchaProperties.getHeight());
+        captcha.setCaptchaLength(captchaProperties.getCaptchaLength());
+    }
+
     /**
      * 生成验证码
      *
      * @param out 输出流
      */
-    public void generateCaptcha(OutputStream out) throws IOException, FontFormatException {
-        captcha = buildPngCaptcha();
+    public void generateCaptcha(OutputStream out) {
         boolean success = captcha.createCaptcha(out);
         if (!success) {
             throw new CaptchaGeneratorException();
@@ -33,8 +44,7 @@ public class PngCaptchaGeneratorStrategy extends AbstractCaptchaGeneratorStrateg
     }
 
     @Override
-    public String generateCaptchaBase64() throws IOException, FontFormatException {
-        captcha = buildPngCaptcha();
+    public String generateCaptchaBase64() {
         return captcha.createBase64Captcha();
     }
 
@@ -45,22 +55,12 @@ public class PngCaptchaGeneratorStrategy extends AbstractCaptchaGeneratorStrateg
 
     @Override
     public CaptchaTypeEnum captchaType() {
-        return CaptchaTypeEnum.PNG_CAPTCHA;
+        return captcha.getCaptchaType();
     }
 
     @Override
-    public String contentType() {
-        return captcha.getContentType().getContentType();
-    }
-
-    private PngCaptcha buildPngCaptcha() throws IOException, FontFormatException {
-        PngCaptcha pngCaptcha = new PngCaptcha();
-        pngCaptcha.setFont(captchaProperties.getFont());
-        pngCaptcha.setCharType(captchaProperties.getCharType());
-        pngCaptcha.setCaptchaWidth(captchaProperties.getWidth());
-        pngCaptcha.setCaptchaHeight(captchaProperties.getHeight());
-        pngCaptcha.setCaptchaLength(captchaProperties.getCaptchaLength());
-        return pngCaptcha;
+    public ContentTypeEnum contentType() {
+        return captcha.getContentType();
     }
 
 }

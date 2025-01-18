@@ -7,6 +7,8 @@ import io.github.lucky845.basic.captcha.proterties.CaptchaProperties;
 import io.github.lucky845.basic.core.exception.CaptchaGeneratorException;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.awt.*;
 import java.io.IOException;
@@ -14,15 +16,16 @@ import java.io.IOException;
 /**
  * @author created by lucky845 on 2025-01-17
  */
+@RequiredArgsConstructor
 public class CaptchaService {
 
+    /**
+     * 获取验证码
+     */
+    @Getter
     private String captcha;
 
     private final CaptchaProperties captchaProperties;
-
-    public CaptchaService(CaptchaProperties captchaProperties) {
-        this.captchaProperties = captchaProperties;
-    }
 
     /**
      * 检验验证码是否生成
@@ -34,15 +37,6 @@ public class CaptchaService {
     }
 
     /**
-     * 获取验证码
-     *
-     * @return 验证码
-     */
-    public String getCaptcha() {
-        return captcha;
-    }
-
-    /**
      * 生成验证码
      *
      * @param response 响应体
@@ -51,7 +45,7 @@ public class CaptchaService {
         try (ServletOutputStream outputStream = response.getOutputStream()) {
             AbstractCaptchaGeneratorStrategy strategy = CaptchaGeneratorFactory.getGenerator(captchaProperties.getCaptchaType());
             // 设置响应头
-            response.setContentType(strategy.contentType());
+            response.setContentType(strategy.contentType().getContentType());
             response.setHeader("Pragma", "No-cache");
             response.setHeader("Cache-Control", "no-cache");
             response.setDateHeader("Expires", 0);

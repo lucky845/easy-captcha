@@ -1,6 +1,8 @@
 package io.github.lucky845.basic.core.enums;
 
 import io.github.lucky845.basic.core.utils.RandomUtils;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 import java.awt.*;
 import java.util.Arrays;
@@ -13,6 +15,8 @@ import java.util.stream.Collectors;
  *
  * @author created by lucky845 on 2025-01-16
  */
+@Getter
+@AllArgsConstructor
 public enum ColorEnum {
 
     RED(new int[]{255, 0, 0}), // 红色
@@ -22,37 +26,13 @@ public enum ColorEnum {
     GRAY(new int[]{128, 128, 128}), // 灰色
     ORANGE(new int[]{255, 165, 0}), // 橙色
     PURPLE(new int[]{128, 0, 128}), // 紫色
+    YELLOW(new int[]{255, 255, 0}), // 黄色
     ;
-
-    ColorEnum(int[] colors) {
-        this.colors = colors;
-    }
-
-    public int[] getColors() {
-        return colors;
-    }
 
     /**
      * RGB颜色
      */
     private final int[] colors;
-
-    private static final Map<int[], ColorEnum> COLOR_MAP;
-
-    static {
-        COLOR_MAP = Arrays.stream(ColorEnum.values())
-                .collect(Collectors.toMap(ColorEnum::getColors, Function.identity()));
-    }
-
-    /**
-     * 根据 RGB颜色 查找对应的枚举实例
-     *
-     * @param colors RGB颜色
-     * @return 对应的枚举实例，如果未找到则返回 null
-     */
-    public static ColorEnum fromType(int[] colors) {
-        return COLOR_MAP.get(colors);
-    }
 
     /**
      * 返回随机颜色

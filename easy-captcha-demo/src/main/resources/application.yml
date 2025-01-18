@@ -8,7 +8,8 @@ easy-captcha:
   enabled: true
   width: 200
   height: 50
-  captcha-type: 0
+  captcha-type: arithmetic_captcha
   captcha-length: 4
-  char-type: 0
-  font: 0
+  char-type: default
+  font: actionj
+  difficulty: easy

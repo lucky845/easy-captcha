@@ -2,6 +2,7 @@ package io.github.lucky845.basic.captcha.generator;
 
 import io.github.lucky845.basic.captcha.proterties.CaptchaProperties;
 import io.github.lucky845.basic.core.enums.CaptchaTypeEnum;
+import io.github.lucky845.basic.core.enums.ContentTypeEnum;
 import jakarta.annotation.Resource;
 
 import java.awt.*;
@@ -53,6 +54,6 @@ public abstract class AbstractCaptchaGeneratorStrategy {
     /**
      * 获取Content-Type
      */
-    public abstract String contentType();
+    public abstract ContentTypeEnum contentType();
 
 }

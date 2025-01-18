@@ -1,11 +1,14 @@
 package io.github.lucky845.basic.core.captcha;
 
 import io.github.lucky845.basic.core.constants.Constants;
+import io.github.lucky845.basic.core.enums.CaptchaTypeEnum;
 import io.github.lucky845.basic.core.enums.CharTypeEnum;
 import io.github.lucky845.basic.core.enums.ColorEnum;
+import io.github.lucky845.basic.core.enums.ContentTypeEnum;
 import io.github.lucky845.basic.core.enums.FontEnum;
 import io.github.lucky845.basic.core.exception.CaptchaGeneratorException;
 import io.github.lucky845.basic.core.utils.RandomUtils;
+import lombok.Data;
 
 import java.awt.*;
 import java.awt.geom.CubicCurve2D;
@@ -14,6 +17,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Base64;
+import java.util.Random;
 import java.util.logging.Logger;
 
 import static io.github.lucky845.basic.core.utils.RandomUtils.chars;
@@ -24,6 +28,7 @@ import static io.github.lucky845.basic.core.utils.RandomUtils.num;
  *
  * @author created by lucky845 on 2025-01-16
  */
+@Data
 public abstract class AbstractCaptcha implements Captcha {
 
     protected Logger logger = Logger.getLogger(this.getClass().getName());
@@ -39,7 +44,7 @@ public abstract class AbstractCaptcha implements Captcha {
     protected Font font;
 
     /**
-     * 验证码类型
+     * 验证码字符类型
      */
     protected CharTypeEnum charType;
 
@@ -58,9 +63,17 @@ public abstract class AbstractCaptcha implements Captcha {
      */
     protected int captchaHeight;
 
-    public AbstractCaptcha() {
+    /**
+     * 获取图片类型
+     *
+     * @return 图片格式，MIME类型
+     */
+    protected abstract ContentTypeEnum getContentType();
 
-    }
+    /**
+     * 获取验证码类型
+     */
+    protected abstract CaptchaTypeEnum getCaptchaType();
 
     /**
      * 给定范围获得随机颜色
@@ -122,10 +135,6 @@ public abstract class AbstractCaptcha implements Captcha {
         return font;
     }
 
-    public void setCharType(int type) {
-        this.charType = CharTypeEnum.fromType(type);
-    }
-
     /**
      * 设置字体
      *
@@ -133,10 +142,6 @@ public abstract class AbstractCaptcha implements Captcha {
      */
     public void setFont(Font font) {
         this.font = font;
-    }
-
-    public void setFont(int type) throws IOException, FontFormatException {
-        setFont(FontEnum.fromType(type));
     }
 
     public void setFont(FontEnum font) throws IOException, FontFormatException {
@@ -163,21 +168,32 @@ public abstract class AbstractCaptcha implements Captcha {
     }
 
     /**
+     * 生成验证码
+     */
+    protected String generateCaptcha() {
+        return switch (getCaptchaType()) {
+            case CaptchaTypeEnum.CHINESE_CAPTCHA, CaptchaTypeEnum.CHINESE_GIF_CAPTCHA -> generateChineseCaptcha();
+            default -> generateRandomCaptcha();
+        };
+    }
+
+    /**
      * 生成随机验证码
      */
-    protected char[] randomCaptcha() {
-        char[] captcha = new char[captchaLength];
+    private String generateRandomCaptcha() {
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < captchaLength; i++) {
             switch (charType) {
-                case TYPE_ONLY_NUMBER -> captcha[i] = chars(Constants.NUM_MAX_INDEX);
-                case TYPE_ONLY_CAPTCHA -> captcha[i] = chars(Constants.CHAR_MIN_INDEX, Constants.CHAR_MAX_INDEX);
-                case TYPE_ONLY_CAPTCHA_NUM -> captcha[i] = chars(Constants.UPPER_MIN_INDEX, Constants.UPPER_MAX_INDEX);
-                case TYPE_ONLY_CAPTCHA_NUM_NUM ->
-                        captcha[i] = chars(Constants.LOWER_MIN_INDEX, Constants.LOWER_MAX_INDEX);
-                case TYPE_ONLY_CAPTCHA_NUM_NUM_NUM -> captcha[i] = chars(Constants.UPPER_MAX_INDEX);
-                default -> captcha[i] = chars();
+                case PURE_NUMBER -> sb.append(chars(Constants.NUM_MAX_INDEX));
+                case PURE_LETTERS -> sb.append(chars(Constants.CHAR_MIN_INDEX, Constants.CHAR_MAX_INDEX));
+                case PURE_CAPITAL_LETTERS -> sb.append(chars(Constants.UPPER_MIN_INDEX, Constants.UPPER_MAX_INDEX));
+                case PURE_LOWERCASE_LETTERS -> sb.append(chars(Constants.LOWER_MIN_INDEX, Constants.LOWER_MAX_INDEX));
+                case ALPHANUMERIC_MIX -> sb.append(chars(Constants.UPPER_MAX_INDEX));
+                default -> sb.append(chars());
             }
         }
+        String captcha = sb.toString();
+        setCaptcha(captcha);
         return captcha;
     }
 
@@ -186,14 +202,82 @@ public abstract class AbstractCaptcha implements Captcha {
      *
      * @return 中文字符串
      */
-    protected String generateChineseCaptcha() {
+    private String generateChineseCaptcha() {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < captchaLength; i++) {
             int index = RandomUtils.num(Constants.DELTA.length());
             char ch = Constants.DELTA.charAt(index);
             sb.append(ch);
         }
-        return sb.toString();
+        String captcha = sb.toString();
+        setCaptcha(captcha);
+        return captcha;
+    }
+
+    /**
+     * 绘制中文验证码
+     */
+    protected void drawChineseCaptcha(Graphics2D g2d) {
+        // 定义字符之间的安全间距
+        int padding = 10; // 可以根据需要调整
+
+        // 设置字体
+        Font font = new Font("宋体", Font.BOLD, 32);
+        g2d.setFont(font);
+
+        // 获取字体度量
+        FontMetrics fontMetrics = g2d.getFontMetrics();
+        int charHeight = fontMetrics.getHeight(); // 字符高度
+        int charWidth = fontMetrics.charWidth('汉'); // 字符宽度（以“汉”为例）
+
+        // 字符之间的水平间距
+        int horizontalSpacing = 10;
+
+        // 生成验证码
+        String chineseCaptcha = generateCaptcha();
+        char[] charArray = chineseCaptcha.toCharArray();
+
+        // 计算总宽度
+        int totalWidth = charArray.length * (charWidth + horizontalSpacing) - horizontalSpacing;
+
+        // 起始绘制位置（水平居中）
+        int startX = (captchaWidth - totalWidth) / 2;
+
+        for (int i = 0; i < charArray.length; i++) {
+            char ch = charArray[i];
+
+            // 计算当前字符的水平位置
+            int x = startX + i * (charWidth + horizontalSpacing);
+
+            // 计算垂直位置的范围
+            int minY = charHeight + padding; // 最小垂直位置
+            int maxY = captchaHeight - padding; // 最大垂直位置
+
+            // 检查参数是否合法
+            if (minY >= maxY) {
+                // 如果最小垂直位置大于等于最大垂直位置，调整范围
+                minY = charHeight;
+                maxY = captchaHeight;
+            }
+
+            // 随机生成垂直位置（在允许范围内）
+            int y = num(minY, maxY);
+
+            // 配置颜色
+            g2d.setColor(randomColor());
+
+            // 设置字体旋转角度（限制在 -15° 到 15° 之间）
+            int degree = new Random().nextInt(30) - 15;
+
+            // 顺时针旋转
+            g2d.rotate(degree * Math.PI / 180, x, y);
+
+            // 开始画汉字
+            g2d.drawString(ch + "", x, y);
+
+            // 逆时针旋转
+            g2d.rotate(-(degree * Math.PI / 180), x, y);
+        }
     }
 
     /**
@@ -207,22 +291,12 @@ public abstract class AbstractCaptcha implements Captcha {
     }
 
     /**
-     * 获取当前验证码的字符数组
-     *
-     * @return 字符数组
-     */
-    public char[] captchaChars() {
-        checkCaptcha();
-        return captcha.toCharArray();
-    }
-
-    /**
      * 检查验证码是否生成，没有则立即生成
      */
     public void checkCaptcha() {
         if (captcha == null) {
             // 生成验证码
-            char[] captcha = randomCaptcha();
+            String captcha = generateCaptcha();
             setCaptcha(captcha);
         }
     }
@@ -325,43 +399,4 @@ public abstract class AbstractCaptcha implements Captcha {
         }
     }
 
-    public Logger getLogger() {
-        return logger;
-    }
-
-    public void setLogger(Logger logger) {
-        this.logger = logger;
-    }
-
-    public CharTypeEnum getCharType() {
-        return charType;
-    }
-
-    public void setCharType(CharTypeEnum charType) {
-        this.charType = charType;
-    }
-
-    public int getCaptchaLength() {
-        return captchaLength;
-    }
-
-    public void setCaptchaLength(int captchaLength) {
-        this.captchaLength = captchaLength;
-    }
-
-    public int getCaptchaWidth() {
-        return captchaWidth;
-    }
-
-    public void setCaptchaWidth(int captchaWidth) {
-        this.captchaWidth = captchaWidth;
-    }
-
-    public int getCaptchaHeight() {
-        return captchaHeight;
-    }
-
-    public void setCaptchaHeight(int captchaHeight) {
-        this.captchaHeight = captchaHeight;
-    }
 }

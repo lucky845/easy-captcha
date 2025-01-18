@@ -2,7 +2,9 @@ package io.github.lucky845.basic.captcha.generator;
 
 import io.github.lucky845.basic.core.captcha.impl.GifCaptcha;
 import io.github.lucky845.basic.core.enums.CaptchaTypeEnum;
+import io.github.lucky845.basic.core.enums.ContentTypeEnum;
 import io.github.lucky845.basic.core.exception.CaptchaGeneratorException;
+import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Component;
 
 import java.awt.*;
@@ -17,9 +19,18 @@ public class GifCaptchaGeneratorStrategy extends AbstractCaptchaGeneratorStrateg
 
     private GifCaptcha captcha;
 
+    @PostConstruct
+    private void init() throws IOException, FontFormatException {
+        captcha = new GifCaptcha();
+        captcha.setFont(captchaProperties.getFont());
+        captcha.setCharType(captchaProperties.getCharType());
+        captcha.setCaptchaWidth(captchaProperties.getWidth());
+        captcha.setCaptchaHeight(captchaProperties.getHeight());
+        captcha.setCaptchaLength(captchaProperties.getCaptchaLength());
+    }
+
     @Override
-    public void generateCaptcha(OutputStream out) throws IOException, FontFormatException {
-        captcha = buildGifCaptcha();
+    public void generateCaptcha(OutputStream out) {
         boolean success = captcha.createCaptcha(out);
         if (!success) {
             throw new CaptchaGeneratorException();
@@ -27,8 +38,7 @@ public class GifCaptchaGeneratorStrategy extends AbstractCaptchaGeneratorStrateg
     }
 
     @Override
-    public String generateCaptchaBase64() throws IOException, FontFormatException {
-        captcha = buildGifCaptcha();
+    public String generateCaptchaBase64() {
         return captcha.createBase64Captcha();
     }
 
@@ -39,22 +49,12 @@ public class GifCaptchaGeneratorStrategy extends AbstractCaptchaGeneratorStrateg
 
     @Override
     public CaptchaTypeEnum captchaType() {
-        return CaptchaTypeEnum.GIF_CAPTCHA;
+        return captcha.getCaptchaType();
     }
 
     @Override
-    public String contentType() {
-        return captcha.getContentType().getContentType();
-    }
-
-    private GifCaptcha buildGifCaptcha() throws IOException, FontFormatException {
-        GifCaptcha gifCaptcha = new GifCaptcha();
-        gifCaptcha.setFont(captchaProperties.getFont());
-        gifCaptcha.setCharType(captchaProperties.getCharType());
-        gifCaptcha.setCaptchaWidth(captchaProperties.getWidth());
-        gifCaptcha.setCaptchaHeight(captchaProperties.getHeight());
-        gifCaptcha.setCaptchaLength(captchaProperties.getCaptchaLength());
-        return gifCaptcha;
+    public ContentTypeEnum contentType() {
+        return captcha.getContentType();
     }
 
 }

@@ -28,12 +28,4 @@ public interface Captcha {
      */
     String createBase64Captcha() throws Exception;
 
-    /**
-     * 获取图片类型
-     *
-     * @return 图片格式，MIME类型
-     */
-    ContentTypeEnum getContentType();
-
-
 }
