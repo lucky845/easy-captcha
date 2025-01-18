@@ -1,5 +1,8 @@
 package io.github.lucky845.basic.core.enums;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
 import java.util.Arrays;
 import java.util.Map;
 import java.util.function.Function;
@@ -10,6 +13,8 @@ import java.util.stream.Collectors;
  *
  * @author created by lucky845 on 2025-01-16
  */
+@Getter
+@AllArgsConstructor
 public enum FontEnum {
 
     PREFIX(0, "fonts/prefix.ttf"),
@@ -24,30 +29,17 @@ public enum FontEnum {
     FRESNEL(9, "fonts/fresnel.ttf"),
     ;
 
-    FontEnum(int type, String path) {
-        this.type = type;
-        this.path = path;
-    }
-
-    public int getType() {
-        return type;
-    }
-
-    public String getPath() {
-        return path;
-    }
-
     // 字体类型
     private final int type;
     // 字体路径
     private final String path;
 
     // 根据 type 查找枚举实例的 Map
-    private static final Map<Integer, FontEnum> FONT_ENUM_MAP;
+    private static final Map<Integer, FontEnum> CACHE;
 
     static {
         // 初始化 FONT_ENUM_MAP
-        FONT_ENUM_MAP = Arrays.stream(values())
+        CACHE = Arrays.stream(values())
                 .collect(Collectors.toMap(FontEnum::getType, Function.identity()));
     }
 
@@ -58,7 +50,7 @@ public enum FontEnum {
      * @return 对应的枚举实例，如果未找到则返回 null
      */
     public static FontEnum fromType(int type) {
-        return FONT_ENUM_MAP.get(type);
+        return CACHE.get(type);
     }
 
     /**

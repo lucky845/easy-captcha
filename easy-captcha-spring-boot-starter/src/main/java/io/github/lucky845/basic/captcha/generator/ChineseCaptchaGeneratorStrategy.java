@@ -2,7 +2,9 @@ package io.github.lucky845.basic.captcha.generator;
 
 import io.github.lucky845.basic.core.captcha.impl.ChineseCaptcha;
 import io.github.lucky845.basic.core.enums.CaptchaTypeEnum;
+import io.github.lucky845.basic.core.enums.ContentTypeEnum;
 import io.github.lucky845.basic.core.exception.CaptchaGeneratorException;
+import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Component;
 
 import java.awt.*;
@@ -17,9 +19,18 @@ public class ChineseCaptchaGeneratorStrategy extends AbstractCaptchaGeneratorStr
 
     private ChineseCaptcha captcha;
 
+    @PostConstruct
+    private void init() throws IOException, FontFormatException {
+        captcha = new ChineseCaptcha();
+        captcha.setFont(captchaProperties.getFont());
+        captcha.setCharType(captchaProperties.getCharType());
+        captcha.setCaptchaWidth(captchaProperties.getWidth());
+        captcha.setCaptchaHeight(captchaProperties.getHeight());
+        captcha.setCaptchaLength(captchaProperties.getCaptchaLength());
+    }
+
     @Override
-    public void generateCaptcha( OutputStream out) throws IOException, FontFormatException {
-        captcha = buildChineseCaptcha();
+    public void generateCaptcha(OutputStream out) {
         boolean success = captcha.createCaptcha(out);
         if (!success) {
             throw new CaptchaGeneratorException();
@@ -27,8 +38,7 @@ public class ChineseCaptchaGeneratorStrategy extends AbstractCaptchaGeneratorStr
     }
 
     @Override
-    public String generateCaptchaBase64() throws IOException, FontFormatException {
-        captcha = buildChineseCaptcha();
+    public String generateCaptchaBase64() {
         return captcha.createBase64Captcha();
     }
 
@@ -39,21 +49,12 @@ public class ChineseCaptchaGeneratorStrategy extends AbstractCaptchaGeneratorStr
 
     @Override
     public CaptchaTypeEnum captchaType() {
-        return CaptchaTypeEnum.CHINESE_CAPTCHA;
+        return captcha.getCaptchaType();
     }
 
     @Override
-    public String contentType() {
-        return captcha.getContentType().getContentType();
+    public ContentTypeEnum contentType() {
+        return captcha.getContentType();
     }
 
-    private ChineseCaptcha buildChineseCaptcha() throws IOException, FontFormatException {
-        ChineseCaptcha chineseCaptcha = new ChineseCaptcha();
-        chineseCaptcha.setFont(captchaProperties.getFont());
-        chineseCaptcha.setCharType(captchaProperties.getCharType());
-        chineseCaptcha.setCaptchaWidth(captchaProperties.getWidth());
-        chineseCaptcha.setCaptchaHeight(captchaProperties.getHeight());
-        chineseCaptcha.setCaptchaLength(captchaProperties.getCaptchaLength());
-        return chineseCaptcha;
-    }
 }

@@ -1,6 +1,7 @@
 package io.github.lucky845.basic.core.captcha.impl;
 
 import io.github.lucky845.basic.core.captcha.AbstractCaptcha;
+import io.github.lucky845.basic.core.enums.CaptchaTypeEnum;
 import io.github.lucky845.basic.core.enums.ContentTypeEnum;
 import io.github.lucky845.basic.core.exception.CaptchaGeneratorException;
 
@@ -17,30 +18,6 @@ import java.util.logging.Level;
  * @author created by lucky845 on 2025-01-16
  */
 public class PngCaptcha extends AbstractCaptcha {
-
-    public PngCaptcha() {
-    }
-
-    public PngCaptcha(int width, int height) {
-        this();
-        setCaptchaWidth(width);
-        setCaptchaHeight(height);
-    }
-
-    public PngCaptcha(int width, int height, int len) {
-        this();
-        setCaptchaWidth(width);
-        setCaptchaHeight(height);
-        setCaptchaLength(len);
-    }
-
-    public PngCaptcha(int width, int height, int len, Font font) {
-        this();
-        setCaptchaWidth(width);
-        setCaptchaHeight(height);
-        setCaptchaLength(len);
-        setFont(font);
-    }
 
     @Override
     public boolean createCaptcha(OutputStream out) throws CaptchaGeneratorException {
@@ -85,5 +62,10 @@ public class PngCaptcha extends AbstractCaptcha {
     @Override
     public ContentTypeEnum getContentType() {
         return ContentTypeEnum.PNG;
+    }
+
+    @Override
+    public CaptchaTypeEnum getCaptchaType() {
+        return CaptchaTypeEnum.PNG_CAPTCHA;
     }
 }

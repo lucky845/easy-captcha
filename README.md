@@ -23,7 +23,7 @@
 <dependency>
     <groupId>io.github.lucky845</groupId>
     <artifactId>easy-captcha-spring-boot-starter</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.2</version>
 </dependency>
 ```
 
@@ -36,10 +36,11 @@ easy-captcha:
   enabled: true
   width: 200
   height: 50
-  captcha-type: 0
+  captcha-type: arithmetic_captcha
   captcha-length: 4
-  char-type: 0
-  font: 0
+  char-type: default
+  font: actionj
+  difficulty: easy
 ```
 
 ## 使用

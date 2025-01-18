@@ -1,6 +1,9 @@
 package io.github.lucky845.basic.core.enums;
 
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
 import java.util.Arrays;
 import java.util.Map;
 import java.util.function.Function;
@@ -9,6 +12,8 @@ import java.util.stream.Collectors;
 /**
  * @author created by lucky845 on 2025-01-16
  */
+@Getter
+@AllArgsConstructor
 public enum CharTypeEnum {
 
     /**
@@ -19,49 +24,41 @@ public enum CharTypeEnum {
     /**
      * 纯数字
      */
-    TYPE_ONLY_NUMBER(1),
+    PURE_NUMBER(1),
 
     /**
      * 纯字母
      */
-    TYPE_ONLY_CAPTCHA(2),
+    PURE_LETTERS(2),
 
     /**
      * 纯大写字母
      */
-    TYPE_ONLY_CAPTCHA_NUM(3),
+    PURE_CAPITAL_LETTERS(3),
 
     /**
      * 纯小写字母
      */
-    TYPE_ONLY_CAPTCHA_NUM_NUM(4),
+    PURE_LOWERCASE_LETTERS(4),
 
     /**
      * 字母数字混合
      */
-    TYPE_ONLY_CAPTCHA_NUM_NUM_NUM(5),
+    ALPHANUMERIC_MIX(5),
 
     ;
 
-    CharTypeEnum(int type) {
-        this.type = type;
-    }
-
-    public int getType() {
-        return type;
-    }
-
     private final int type;
 
-    private static final Map<Integer, CharTypeEnum> TYPE_ENUM_MAP;
+    private static final Map<Integer, CharTypeEnum> CACHE;
 
     static {
-        TYPE_ENUM_MAP = Arrays.stream(values())
+        CACHE = Arrays.stream(values())
                 .collect(Collectors.toMap(e -> e.type, Function.identity()));
     }
 
     public static CharTypeEnum fromType(int type) {
-        return TYPE_ENUM_MAP.get(type);
+        return CACHE.get(type);
     }
 
 }

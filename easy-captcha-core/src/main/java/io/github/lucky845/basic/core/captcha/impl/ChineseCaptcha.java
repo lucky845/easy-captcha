@@ -1,6 +1,7 @@
 package io.github.lucky845.basic.core.captcha.impl;
 
 import io.github.lucky845.basic.core.captcha.AbstractCaptcha;
+import io.github.lucky845.basic.core.enums.CaptchaTypeEnum;
 import io.github.lucky845.basic.core.enums.ContentTypeEnum;
 import io.github.lucky845.basic.core.exception.CaptchaGeneratorException;
 
@@ -16,30 +17,6 @@ import java.io.OutputStream;
  * @author created by lucky845 on 2025-01-16
  */
 public class ChineseCaptcha extends AbstractCaptcha {
-
-    public ChineseCaptcha() {
-    }
-
-    public ChineseCaptcha(int width, int height) {
-        this();
-        setCaptchaWidth(width);
-        setCaptchaHeight(height);
-    }
-
-    public ChineseCaptcha(int width, int height, int len) {
-        this();
-        setCaptchaWidth(width);
-        setCaptchaHeight(height);
-        setCaptchaLength(len);
-    }
-
-    public ChineseCaptcha(int width, int height, int len, Font font) {
-        this();
-        setCaptchaWidth(width);
-        setCaptchaHeight(height);
-        setCaptchaLength(len);
-        setFont(font);
-    }
 
     @Override
     public boolean createCaptcha(OutputStream out) throws CaptchaGeneratorException {
@@ -59,9 +36,7 @@ public class ChineseCaptcha extends AbstractCaptcha {
         drawOval(5, g2d);
 
         // 绘制中文字符
-        g2d.setColor(Color.BLACK);
-        g2d.setFont(getFont());
-        g2d.drawString(generateChineseCaptcha(), 10, captchaHeight / 2);
+        drawChineseCaptcha(g2d);
 
         g2d.dispose();
 
@@ -76,5 +51,10 @@ public class ChineseCaptcha extends AbstractCaptcha {
     @Override
     public ContentTypeEnum getContentType() {
         return ContentTypeEnum.PNG;
+    }
+
+    @Override
+    public CaptchaTypeEnum getCaptchaType() {
+        return CaptchaTypeEnum.CHINESE_CAPTCHA;
     }
 }

@@ -2,7 +2,9 @@ package io.github.lucky845.basic.captcha.generator;
 
 import io.github.lucky845.basic.core.captcha.impl.ChineseGifCaptcha;
 import io.github.lucky845.basic.core.enums.CaptchaTypeEnum;
+import io.github.lucky845.basic.core.enums.ContentTypeEnum;
 import io.github.lucky845.basic.core.exception.CaptchaGeneratorException;
+import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Component;
 
 import java.awt.*;
@@ -17,9 +19,18 @@ public class ChineseGifCaptchaGeneratorStrategy extends AbstractCaptchaGenerator
 
     private ChineseGifCaptcha captcha;
 
+    @PostConstruct
+    private void init() throws IOException, FontFormatException {
+        captcha = new ChineseGifCaptcha();
+        captcha.setFont(captchaProperties.getFont());
+        captcha.setCharType(captchaProperties.getCharType());
+        captcha.setCaptchaWidth(captchaProperties.getWidth());
+        captcha.setCaptchaHeight(captchaProperties.getHeight());
+        captcha.setCaptchaLength(captchaProperties.getCaptchaLength());
+    }
+
     @Override
-    public void generateCaptcha(OutputStream out) throws IOException, FontFormatException {
-        captcha = buildChineseGifCaptcha();
+    public void generateCaptcha(OutputStream out) {
         boolean success = captcha.createCaptcha(out);
         if (!success) {
             throw new CaptchaGeneratorException();
@@ -27,8 +38,7 @@ public class ChineseGifCaptchaGeneratorStrategy extends AbstractCaptchaGenerator
     }
 
     @Override
-    public String generateCaptchaBase64() throws IOException, FontFormatException {
-        captcha = buildChineseGifCaptcha();
+    public String generateCaptchaBase64() {
         return captcha.createBase64Captcha();
     }
 
@@ -39,21 +49,12 @@ public class ChineseGifCaptchaGeneratorStrategy extends AbstractCaptchaGenerator
 
     @Override
     public CaptchaTypeEnum captchaType() {
-        return CaptchaTypeEnum.CHINESE_GIF_CAPTCHA;
+        return captcha.getCaptchaType();
     }
 
     @Override
-    public String contentType() {
-        return captcha.getContentType().getContentType();
+    public ContentTypeEnum contentType() {
+        return captcha.getContentType();
     }
 
-    private ChineseGifCaptcha buildChineseGifCaptcha() throws IOException, FontFormatException {
-        ChineseGifCaptcha chineseGifCaptcha = new ChineseGifCaptcha();
-        chineseGifCaptcha.setFont(captchaProperties.getFont());
-        chineseGifCaptcha.setCharType(captchaProperties.getCharType());
-        chineseGifCaptcha.setCaptchaWidth(captchaProperties.getWidth());
-        chineseGifCaptcha.setCaptchaHeight(captchaProperties.getHeight());
-        chineseGifCaptcha.setCaptchaLength(captchaProperties.getCaptchaLength());
-        return chineseGifCaptcha;
-    }
 }

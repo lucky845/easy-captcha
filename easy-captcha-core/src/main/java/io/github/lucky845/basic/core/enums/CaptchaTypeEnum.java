@@ -1,6 +1,9 @@
 package io.github.lucky845.basic.core.enums;
 
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
 import java.util.Arrays;
 import java.util.Map;
 import java.util.function.Function;
@@ -9,6 +12,8 @@ import java.util.stream.Collectors;
 /**
  * @author created by lucky845 on 2025-01-16
  */
+@Getter
+@AllArgsConstructor
 public enum CaptchaTypeEnum {
 
     /**
@@ -38,20 +43,12 @@ public enum CaptchaTypeEnum {
 
     ;
 
-    CaptchaTypeEnum(int type) {
-        this.type = type;
-    }
-
-    public int getType() {
-        return type;
-    }
-
     private final int type;
 
-    private static final Map<Integer, CaptchaTypeEnum> TYPE_ENUM_MAP;
+    private static final Map<Integer, CaptchaTypeEnum> CACHE;
 
     static {
-        TYPE_ENUM_MAP = Arrays.stream(values())
+        CACHE = Arrays.stream(values())
                 .collect(Collectors.toMap(CaptchaTypeEnum::getType, Function.identity()));
     }
 
@@ -61,7 +58,7 @@ public enum CaptchaTypeEnum {
      * @param type type
      */
     public static CaptchaTypeEnum fromType(int type) {
-        return TYPE_ENUM_MAP.get(type);
+        return CACHE.get(type);
     }
 
 }

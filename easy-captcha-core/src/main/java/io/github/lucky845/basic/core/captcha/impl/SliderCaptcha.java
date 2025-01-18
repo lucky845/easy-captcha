@@ -1,6 +1,7 @@
 package io.github.lucky845.basic.core.captcha.impl;
 
 import io.github.lucky845.basic.core.captcha.AbstractCaptcha;
+import io.github.lucky845.basic.core.enums.CaptchaTypeEnum;
 import io.github.lucky845.basic.core.enums.ContentTypeEnum;
 import io.github.lucky845.basic.core.exception.CaptchaGeneratorException;
 import io.github.lucky845.basic.core.utils.RandomUtils;
@@ -65,6 +66,11 @@ public class SliderCaptcha extends AbstractCaptcha {
     @Override
     public ContentTypeEnum getContentType() {
         return ContentTypeEnum.PNG;
+    }
+
+    @Override
+    protected CaptchaTypeEnum getCaptchaType() {
+        return null;
     }
 
     /**

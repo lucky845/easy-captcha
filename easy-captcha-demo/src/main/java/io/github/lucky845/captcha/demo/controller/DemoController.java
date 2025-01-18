@@ -53,14 +53,14 @@ public class DemoController {
     }
 
     @GetMapping("captchaNew")
-    public void captchaNew(HttpServletResponse response) throws IOException, FontFormatException {
+    public void captchaNew(HttpServletResponse response) {
         captchaService.generateCaptcha(response);
         // 此处仅打印验证码，实际使用请保存至Redis
         logger.info(captchaService.getCaptcha());
     }
 
     @GetMapping("captchaBase64New")
-    public String captchaBase64New() throws IOException, FontFormatException {
+    public String captchaBase64New() {
         String base64Captcha = captchaService.generateCaptchaBase64();
         // 此处仅打印验证码，实际使用请保存至Redis
         logger.info(captchaService.getCaptcha());
