@@ -9,15 +9,15 @@ import java.security.SecureRandom;
  */
 public class RandomUtils {
 
-    private RandomUtils() {
-        throw new AssertionError();
-    }
-
     private static final SecureRandom SECURE_RANDOM;
 
     static {
         SECURE_RANDOM = new SecureRandom();
         SECURE_RANDOM.setSeed(System.currentTimeMillis());
+    }
+
+    private RandomUtils() {
+        throw new AssertionError();
     }
 
     /**

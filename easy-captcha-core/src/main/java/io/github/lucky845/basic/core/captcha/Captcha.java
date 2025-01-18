@@ -1,7 +1,6 @@
 package io.github.lucky845.basic.core.captcha;
 
 
-import io.github.lucky845.basic.core.enums.ContentTypeEnum;
 import io.github.lucky845.basic.core.exception.CaptchaGeneratorException;
 
 import java.io.OutputStream;

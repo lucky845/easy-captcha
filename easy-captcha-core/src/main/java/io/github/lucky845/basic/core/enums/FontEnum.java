@@ -29,11 +29,6 @@ public enum FontEnum {
     FRESNEL(9, "fonts/fresnel.ttf"),
     ;
 
-    // 字体类型
-    private final int type;
-    // 字体路径
-    private final String path;
-
     // 根据 type 查找枚举实例的 Map
     private static final Map<Integer, FontEnum> CACHE;
 
@@ -42,6 +37,11 @@ public enum FontEnum {
         CACHE = Arrays.stream(values())
                 .collect(Collectors.toMap(FontEnum::getType, Function.identity()));
     }
+
+    // 字体类型
+    private final int type;
+    // 字体路径
+    private final String path;
 
     /**
      * 根据 type 查找对应的枚举实例

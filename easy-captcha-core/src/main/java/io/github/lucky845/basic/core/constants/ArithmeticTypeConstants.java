@@ -19,7 +19,7 @@ public class ArithmeticTypeConstants {
     /**
      * 乘法
      */
-    public static final char MULTIPLICATION = '*';
+    public static final char MULTIPLICATION = 'x';
 
     /**
      * 除法

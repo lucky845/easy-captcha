@@ -12,11 +12,11 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class CaptchaGeneratorFactory {
 
+    private static final Map<CaptchaTypeEnum, AbstractCaptchaGeneratorStrategy> CAPTCHA_GENERATOR_MAP = new ConcurrentHashMap<>();
+
     private CaptchaGeneratorFactory() {
         throw new IllegalStateException("Utility class");
     }
-
-    private static final Map<CaptchaTypeEnum, AbstractCaptchaGeneratorStrategy> CAPTCHA_GENERATOR_MAP = new ConcurrentHashMap<>();
 
     public static void registerGenerator(CaptchaTypeEnum captchaTypeEnum, AbstractCaptchaGeneratorStrategy generator) {
         CAPTCHA_GENERATOR_MAP.put(captchaTypeEnum, generator);

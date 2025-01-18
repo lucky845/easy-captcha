@@ -3,6 +3,8 @@ package io.github.lucky845.basic.captcha.config;
 
 import com.alibaba.ttl.threadpool.TtlExecutors;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.util.concurrent.ThreadFactory;
@@ -11,6 +13,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 /**
  * @author created by lucky845 on 2025-01-17
  */
+@Configuration
 public class ThreadPoolConfig {
 
     private static final String CAPTCHA_THREAD_POOL_NAME = "captcha-thread-pool-";
@@ -23,6 +26,7 @@ public class ThreadPoolConfig {
         return TtlExecutors.getDisableInheritableThreadFactory(factory);
     }
 
+    @Primary
     @Bean
     public ThreadPoolTaskExecutor threadPoolTaskExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();

@@ -5,7 +5,6 @@ import io.github.lucky845.basic.core.enums.CaptchaTypeEnum;
 import io.github.lucky845.basic.core.enums.ContentTypeEnum;
 
 import java.awt.*;
-import java.util.Random;
 
 /**
  * 中文 GIF 验证码
