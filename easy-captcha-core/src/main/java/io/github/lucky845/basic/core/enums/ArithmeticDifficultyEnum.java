@@ -23,14 +23,14 @@ public enum ArithmeticDifficultyEnum {
     EXPERT(4),    // 专家: 包含括号的复杂运算
     ;
 
-    private final int level;
-
     private static final Map<Integer, ArithmeticDifficultyEnum> CACHE;
 
     static {
         CACHE = Arrays.stream(values())
                 .collect(Collectors.toMap(ArithmeticDifficultyEnum::getLevel, Function.identity()));
     }
+
+    private final int level;
 
     /**
      * 获取难度级别

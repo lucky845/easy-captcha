@@ -43,14 +43,14 @@ public enum CaptchaTypeEnum {
 
     ;
 
-    private final int type;
-
     private static final Map<Integer, CaptchaTypeEnum> CACHE;
 
     static {
         CACHE = Arrays.stream(values())
                 .collect(Collectors.toMap(CaptchaTypeEnum::getType, Function.identity()));
     }
+
+    private final int type;
 
     /**
      * 根据type获取

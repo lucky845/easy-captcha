@@ -1,7 +1,7 @@
 package io.github.lucky845.basic.core.captcha;
 
-import io.github.lucky845.basic.core.exception.CaptchaGeneratorException;
 import io.github.lucky845.basic.core.encoder.AnimatedGifEncoder;
+import io.github.lucky845.basic.core.exception.CaptchaGeneratorException;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -158,14 +158,14 @@ public abstract class AbstractGifCaptcha extends AbstractCaptcha {
     }
 
     /**
+     * 获取字体
+     */
+    protected abstract Font font();
+
+    /**
      * 字符样式内部类
      */
     private record CharacterStyle(int x, int y, Color color, double rotation) {
     }
-
-    /**
-     * 获取字体
-     */
-    protected abstract Font font();
 
 }

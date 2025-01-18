@@ -159,14 +159,6 @@ public abstract class AbstractCaptcha implements Captcha {
                 .deriveFont(style, size);
     }
 
-    public void setCaptcha(String captcha) {
-        this.captcha = captcha;
-    }
-
-    public void setCaptcha(char[] captcha) {
-        this.captcha = new String(captcha);
-    }
-
     /**
      * 生成验证码
      */
@@ -288,6 +280,14 @@ public abstract class AbstractCaptcha implements Captcha {
     public String getCaptcha() {
         checkCaptcha();
         return captcha;
+    }
+
+    public void setCaptcha(String captcha) {
+        this.captcha = captcha;
+    }
+
+    public void setCaptcha(char[] captcha) {
+        this.captcha = new String(captcha);
     }
 
     /**

@@ -48,14 +48,14 @@ public enum CharTypeEnum {
 
     ;
 
-    private final int type;
-
     private static final Map<Integer, CharTypeEnum> CACHE;
 
     static {
         CACHE = Arrays.stream(values())
                 .collect(Collectors.toMap(e -> e.type, Function.identity()));
     }
+
+    private final int type;
 
     public static CharTypeEnum fromType(int type) {
         return CACHE.get(type);

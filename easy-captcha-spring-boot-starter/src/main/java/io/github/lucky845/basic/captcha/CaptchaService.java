@@ -19,13 +19,12 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class CaptchaService {
 
+    private final CaptchaProperties captchaProperties;
     /**
      * 获取验证码
      */
     @Getter
     private String captcha;
-
-    private final CaptchaProperties captchaProperties;
 
     /**
      * 检验验证码是否生成

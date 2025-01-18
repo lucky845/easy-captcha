@@ -2,9 +2,9 @@ package io.github.lucky845.basic.core.captcha.impl;
 
 import io.github.lucky845.basic.core.captcha.AbstractCaptcha;
 import io.github.lucky845.basic.core.constants.ArithmeticTypeConstants;
+import io.github.lucky845.basic.core.enums.ArithmeticDifficultyEnum;
 import io.github.lucky845.basic.core.enums.CaptchaTypeEnum;
 import io.github.lucky845.basic.core.enums.ContentTypeEnum;
-import io.github.lucky845.basic.core.enums.ArithmeticDifficultyEnum;
 import io.github.lucky845.basic.core.exception.CaptchaGeneratorException;
 
 import javax.imageio.ImageIO;
@@ -24,8 +24,8 @@ import static io.github.lucky845.basic.core.utils.RandomUtils.num;
  */
 public class ArithmeticCaptcha extends AbstractCaptcha {
 
-    private ArithmeticDifficultyEnum difficultyEnum = ArithmeticDifficultyEnum.EASY; // 默认难度级别
     private static final int MAX_RESULT = 100; // 最大结果限制
+    private ArithmeticDifficultyEnum difficultyEnum = ArithmeticDifficultyEnum.EASY; // 默认难度级别
 
     /**
      * 设置难度级别
