@@ -2,6 +2,10 @@ spring:
   application:
     name: easy-captcha-demo
 
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
 
 # 验证码相关配置
 easy-captcha:
