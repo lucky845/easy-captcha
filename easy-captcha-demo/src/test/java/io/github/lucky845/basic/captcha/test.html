@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>验证码测试</title>
+    <script>
+        const host = "http://localhost:8080";
+        let num;
+        let randomNumber = function () {
+            return Math.floor(Math.random() * 1000000) + 1;
+        };
+
+        window.onload = function () {
+            refreshCaptcha();
+        };
+
+        function refreshCaptcha() {
+            const captchaImg = document.getElementById("captchaImg");
+            num = randomNumber();
+            captchaImg.src = `${host}/captcha/` + num;
+        }
+
+        function validateCaptcha() {
+            const userInput = document.getElementById("captchaInput").value;
+            fetch(`${host}/validateCaptcha`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({captcha: userInput, num})
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.valid) {
+                        alert("验证码正确！");
+                    } else {
+                        alert("验证码错误！");
+                        refreshCaptcha();
+                    }
+                })
+                .catch(error => {
+                    console.error("请求失败", error);
+                });
+        }
+    </script>
+</head>
+<body>
+<h1>验证码测试</h1>
+<div>
+    <img id="captchaImg" alt="验证码" src=""/>
+    <button onclick="refreshCaptcha()">刷新验证码</button>
+</div>
+<div>
+    <label for="captchaInput"></label><input type="text" id="captchaInput" placeholder="请输入验证码"/>
+    <button onclick="validateCaptcha()">验证验证码</button>
+</div>
+</body>
+</html>
