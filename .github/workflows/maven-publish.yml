@@ -3,8 +3,6 @@ name: Maven Package
 on:
   pull_request:
     branches: [ "master" ]
-  merge:
-    branches: [ "master" ]
   release:
     types: [ created ]
 
