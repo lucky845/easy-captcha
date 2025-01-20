@@ -377,6 +377,14 @@
         <profile>
             <id>release</id>
 
+            <distributionManagement>
+                <repository>
+                    <id>github</id>
+                    <name>GitHub Packages</name>
+                    <url>https://maven.pkg.github.com/lucky845/easy-captcha</url>
+                </repository>
+            </distributionManagement>
+
             <repositories>
                 <repository>
                     <name>Central Portal Snapshots</name>
