@@ -14,10 +14,29 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v2
 
-      - name: Merge Dependabot PR
+      - name: Create and switch to a new branch
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git checkout -b dependabot-fix-${{ github.event.pull_request.head.ref }}
+          git merge ${{ github.event.pull_request.base.ref }} --ff-only
+
+      - name: Push new branch
+        run: |
+          git push origin dependabot-fix-${{ github.event.pull_request.head.ref }}
+
+      - name: Create a pull request
+        id: create_pr
+        uses: peter-evans/create-pull-request@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: Merge dependabot-fix-${{ github.event.pull_request.head.ref }}
+          branch: dependabot-fix-${{ github.event.pull_request.head.ref }}
+          title: Merge dependabot-fix-${{ github.event.pull_request.head.ref }}
+          body: "This is an automated pull request to merge dependabot-fix-${{ github.event.pull_request.head.ref }}"
+
+      - name: Merge Dependabot PR
+        run: |
           git checkout ${{ github.event.pull_request.head.ref }}
           git merge ${{ github.event.pull_request.base.ref }} --ff-only
           git push origin ${{ github.event.pull_request.head.ref }}
