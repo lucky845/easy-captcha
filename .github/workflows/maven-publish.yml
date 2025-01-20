@@ -3,6 +3,7 @@ name: Maven Package
 on:
   pull_request:
     branches: [ "master" ]
+    types: [ closed ]
   release:
     types: [ created ]
 
@@ -28,6 +29,6 @@ jobs:
         run: mvn -B package --file pom.xml -DskipTests
 
       - name: Publish to GitHub Packages Apache Maven
-        run: mvn --batch-mode deploy -s $GITHUB_WORKSPACE/settings.xml -P release
+        run: mvn --batch-mode deploy -s $GITHUB_WORKSPACE/settings.xml -P github
         env:
           GITHUB_TOKEN: ${{ github.token }}
