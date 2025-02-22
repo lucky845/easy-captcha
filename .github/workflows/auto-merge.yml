@@ -15,32 +15,47 @@ jobs:
     if: github.actor == 'dependabot[bot]'
 
     steps:
-      - name: Checkout repo
+      - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Create and switch to a new branch
+      - name: Fetch latest changes
+        run: git fetch origin
+
+      - name: Ensure base branch is up-to-date
         run: |
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git checkout -b dependabot-fix-${{ github.event.pull_request.head.ref }}
-          git merge ${{ github.event.pull_request.base.ref }} --ff-only
+          git checkout ${{ github.event.pull_request.base.ref }}
+          git pull --rebase origin ${{ github.event.pull_request.base.ref }}
 
-      - name: Push new branch
-        run: |
-          git push origin dependabot-fix-${{ github.event.pull_request.head.ref }}
-
-      - name: Create a pull request
-        id: create_pr
-        uses: peter-evans/create-pull-request@v3
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: Merge dependabot-fix-${{ github.event.pull_request.head.ref }}
-          branch: dependabot-fix-${{ github.event.pull_request.head.ref }}
-          title: Merge dependabot-fix-${{ github.event.pull_request.head.ref }}
-          body: "This is an automated pull request to merge dependabot-fix-${{ github.event.pull_request.head.ref }}"
-
-      - name: Merge Dependabot PR
+      - name: Attempt fast-forward merge
         run: |
           git checkout ${{ github.event.pull_request.head.ref }}
           git merge ${{ github.event.pull_request.base.ref }} --ff-only
-          git push origin ${{ github.event.pull_request.head.ref }}
+
+      - name: Check merge success
+        id: merge_check
+        run: |
+          if [ $(git rev-parse HEAD) != $(git rev-parse ${{ github.event.pull_request.base.ref }}) ]; then
+            echo "::error::Fast-forward merge failed"
+            exit 1
+          fi
+
+      - name: Push merged changes
+        run: |
+          git push origin ${{ github.event.pull_request.base.ref }}
+          git push --set-upstream origin ${{ github.event.pull_request.base.ref }}
+
+      - name: Close Pull Request
+        uses: peter-evans/close-pull-request@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          pull_number: ${{ github.event.pull_request.number }}
+          comment: |
+            This pull request has been automatically merged by Dependabot.
+            🚀 Changes were fast-forwarded to the base branch without conflicts.
+
+      - name: Add merge commit to PR (if needed)
+        run: |
+          # Only run if the PR was not merged by another workflow
+          if [ "${{ github.event.pull_request.merged }}" == "false" ]; then
+            git push origin --force-with-lease ${{ github.event.pull_request.head.ref }}
+          fi
