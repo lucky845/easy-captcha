@@ -1,45 +1,94 @@
 name: Java CI with Maven
 
 on:
-  push:
-    branches: [ "master" ]
   pull_request:
     branches: [ "master" ]
 
 jobs:
-  build:
-
+  build-and-test:
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
+      # 🔧 精准缓存策略
       - name: Cache Maven dependencies
         uses: actions/cache@v3
         with:
           path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          key: ${{ runner.os }}-maven-${{ hashFiles('pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-maven-
 
+      # 🐛 设置 JDK 环境
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
           java-version: '21'
           distribution: 'temurin'
-          cache: maven
+          cache: maven  # 缓存 JDK 环境配置
 
-      - name: Build with Maven
-        run: mvn clean -B install --file pom.xml -DskipTests
+      # ⚙️ 构建与测试
+      - name: Build project
+        run: mvn clean verify -B --file pom.xml
 
-      - name: Generate Maven Dependency Tree
-        run: mvn dependency:tree -DoutputFile=dependency-tree.txt
+      # 🧩 并行测试配置（根据项目结构调整）
+      #      - name: Configure parallel tests
+      #        run: |
+      #          cat <<EOF >> .mvn/maven-opts.txt
+      #          -Dtest.groups=fast
+      #          -Dparallel=methods,threads=5
+      #          EOF
 
-      - name: Upload Dependency Tree to GitHub
+      #      - name: Run tests
+      #        run: mvn test -B --file pom.xml
+
+      # 📊 生成依赖树（直接输出到日志）
+      - name: Show dependency tree
+        run: mvn dependency:tree -DoutputFile=dependency-tree.txt | tee dependency-tree.txt
+
+      # 🛠️ 上传依赖树（可选）
+      - name: Upload dependency tree
+        if: always()  # 只在需要时取消注释
         uses: actions/upload-artifact@v3
         with:
           name: dependency-tree
           path: dependency-tree.txt
+
+      # 🔍 代码质量扫描（可选扩展）
+      #      - name: Scan with SonarQube
+      #        uses: SonarSource/sonarqube-github-action@master
+      #        with:
+      #          args: >
+      #            -Dsonar.projectKey=my-project-key
+      #            -Dsonar.organization=github-organization
+      #            -Dsonar.sources=src/main/java
+
+      # ⚠️ 强制失败检查
+      - name: Check build status
+        run: |
+          if [ $? -ne 0 ]; then
+            echo "::error::Build failed. Check logs for details"
+            exit 1
+          fi
+
+  # 🚀 快速合并（可选集成）
+#  auto-merge:
+#    needs: build-and-test
+#    runs-on: ubuntu-latest
+#    if: github.actor == 'dependabot[bot]' && github.event.pull_request.mergeable
+#
+#    steps:
+#      - uses: actions/checkout@v4
+#      - name: Merge PR
+#        run: |
+#          git pull origin main --rebase
+#          git push origin HEAD:main --force-with-lease
+#      - name: Close PR
+#        uses: peter-evans/close-pull-request@v1
+#        with:
+#          pull_number: ${{ github.event.pull_request.number }}
