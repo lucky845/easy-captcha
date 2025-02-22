@@ -51,8 +51,7 @@ jobs:
       packages: write
 
     if: |
-      github.event_name == 'release' &&
-      github.event.release.tag_name =~ ^\d+\.\d+\.\d+$
+      github.event_name == 'release'
 
     steps:
       - uses: actions/checkout@v4
