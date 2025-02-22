@@ -45,13 +45,28 @@ jobs:
           git push --set-upstream origin ${{ github.event.pull_request.base.ref }}
 
       - name: Close Pull Request
-        uses: peter-evans/close-pull-request@v1
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          pull_number: ${{ github.event.pull_request.number }}
-          comment: |
+        uses: actions/github-script@v6
+        env:
+          COMMENT: |
             This pull request has been automatically merged by Dependabot.
             🚀 Changes were fast-forwarded to the base branch without conflicts.
+        with:
+          script: |
+            // 关闭 PR
+            await github.rest.pulls.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: ${{ github.event.pull_request.number }},
+              state: 'closed'
+            });
+            
+            // 添加评论
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: ${{ github.event.pull_request.number }},
+              body: process.env.COMMENT
+            });
 
       - name: Add merge commit to PR (if needed)
         run: |
