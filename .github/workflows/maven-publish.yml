@@ -82,6 +82,12 @@ jobs:
 
       # 📢 发布通知
       - name: Send release notification
-        uses: some-notification-action@v1
+        uses: github/actions/send-notification@v3
         with:
-          message: "Release ${github.event.release.tag_name} has been successfully published 🎉"
+          subject: "🚀 Release ${github.event.release.tag_name} 已发布"
+          body: |
+            ## 🎉 发布成功通知
+            
+            - **版本**: ${github.event.release.tag_name}
+            - **仓库**: [${github.repository}](${github.repository_url})
+            - **构建日志**: [点击查看](${github.server_url}/${github.repository}/actions/runs/${github.run_id})
