@@ -21,7 +21,7 @@
 
         <maven.deploy.skip>true</maven.deploy.skip>
 
-        <netty.version>4.1.119.Final</netty.version>
+        <netty.version>4.2.0.Final</netty.version>
         <json-smart.version>2.5.2</json-smart.version>
         <xmlunit-core.version>2.10.0</xmlunit-core.version>
     </properties>
