@@ -66,7 +66,7 @@
         <maven.deploy.plugin.version>3.1.4</maven.deploy.plugin.version>
 
         <!-- dependencies version -->
-        <lombok.version>1.18.36</lombok.version>
+        <lombok.version>1.18.38</lombok.version>
         <spring-boot.version>3.4.4</spring-boot.version>
         <transmittable-thread-local.version>2.14.5</transmittable-thread-local.version>
     </properties>
