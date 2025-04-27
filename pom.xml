@@ -67,7 +67,7 @@
 
         <!-- dependencies version -->
         <lombok.version>1.18.38</lombok.version>
-        <spring-boot.version>3.4.4</spring-boot.version>
+        <spring-boot.version>3.4.5</spring-boot.version>
         <transmittable-thread-local.version>2.14.5</transmittable-thread-local.version>
     </properties>
 
