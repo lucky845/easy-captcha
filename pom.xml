@@ -58,16 +58,16 @@
         <maven.compiler.plugin.version>3.14.0</maven.compiler.plugin.version>
         <maven.resource.plugin.version>3.3.1</maven.resource.plugin.version>
         <maven.jar.plugin.version>3.4.2</maven.jar.plugin.version>
-        <maven.surefire.plugin.version>3.5.2</maven.surefire.plugin.version>
+        <maven.surefire.plugin.version>3.5.3</maven.surefire.plugin.version>
         <maven.spring.boot.plugin.version>3.4.1</maven.spring.boot.plugin.version>
         <maven.versions.plugin.version>2.18.0</maven.versions.plugin.version>
-        <maven.javadoc.plugin.version>3.11.2</maven.javadoc.plugin.version>
+        <maven.javadoc.plugin.version>3.11.3</maven.javadoc.plugin.version>
         <maven.source.plugin.version>2.4</maven.source.plugin.version>
         <maven.deploy.plugin.version>3.1.4</maven.deploy.plugin.version>
 
         <!-- dependencies version -->
-        <lombok.version>1.18.36</lombok.version>
-        <spring-boot.version>3.4.4</spring-boot.version>
+        <lombok.version>1.18.38</lombok.version>
+        <spring-boot.version>3.5.5</spring-boot.version>
         <transmittable-thread-local.version>2.14.5</transmittable-thread-local.version>
     </properties>
 
@@ -403,7 +403,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>3.11.2</version>
+                        <version>3.11.3</version>
                         <executions>
                             <execution>
                                 <phase>package</phase>
@@ -444,7 +444,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>3.11.2</version>
+                        <version>3.11.3</version>
                         <executions>
                             <execution>
                                 <phase>package</phase>
@@ -459,7 +459,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
-                        <version>3.2.7</version>
+                        <version>3.2.8</version>
                         <executions>
                             <execution>
                                 <id>sign-artifacts</id>
@@ -481,7 +481,7 @@
                     <plugin>
                         <groupId>org.sonatype.central</groupId>
                         <artifactId>central-publishing-maven-plugin</artifactId>
-                        <version>0.7.0</version>
+                        <version>0.8.0</version>
                         <extensions>true</extensions>
                         <configuration>
                             <publishingServerId>${server.id.value}</publishingServerId>
