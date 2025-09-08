@@ -1,76 +1,21 @@
-name: Auto Merge Dependabot PRs
+name: Automerge Dependabot PR
 
 on:
   pull_request:
-    types:
-      - opened
-      - synchronize
+    types: [ labeled, synchronize, opened, ready_for_review ]
 
 jobs:
-  auto-merge:
+  automerge:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pull-requests: write
-    if: github.actor == 'dependabot[bot]'
-
+    if: contains(join(github.event.pull_request.labels.*.name, ','), 'dependencies')
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+      - name: Checkout repo
+        uses: actions/checkout@v4
 
-      - name: Fetch latest changes
-        run: git fetch origin
-
-      - name: Ensure base branch is up-to-date
-        run: |
-          git checkout ${{ github.event.pull_request.base.ref }}
-          git pull --rebase origin ${{ github.event.pull_request.base.ref }}
-
-      - name: Attempt fast-forward merge
-        run: |
-          git checkout ${{ github.event.pull_request.head.ref }}
-          git merge ${{ github.event.pull_request.base.ref }} --ff-only
-
-      - name: Check merge success
-        id: merge_check
-        run: |
-          if [ $(git rev-parse HEAD) != $(git rev-parse ${{ github.event.pull_request.base.ref }}) ]; then
-            echo "::error::Fast-forward merge failed"
-            exit 1
-          fi
-
-      - name: Push merged changes
-        run: |
-          git push origin ${{ github.event.pull_request.base.ref }}
-          git push --set-upstream origin ${{ github.event.pull_request.base.ref }}
-
-      - name: Close Pull Request
-        uses: actions/github-script@v6
-        env:
-          COMMENT: |
-            This pull request has been automatically merged by Dependabot.
-            🚀 Changes were fast-forwarded to the base branch without conflicts.
+      - name: Enable Auto-Merge
+        if: steps.create-pr.outputs.pull-request-number != ''
+        uses: peter-evans/enable-pull-request-automerge@v2
         with:
-          script: |
-            // 关闭 PR
-            await github.rest.pulls.update({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: ${{ github.event.pull_request.number }},
-              state: 'closed'
-            });
-            
-            // 添加评论
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: ${{ github.event.pull_request.number }},
-              body: process.env.COMMENT
-            });
-
-      - name: Add merge commit to PR (if needed)
-        run: |
-          # Only run if the PR was not merged by another workflow
-          if [ "${{ github.event.pull_request.merged }}" == "false" ]; then
-            git push origin --force-with-lease ${{ github.event.pull_request.head.ref }}
-          fi
+          token: ${{ secrets.GITHUB_TOKEN }}
+          pull-request-number: ${{ steps.create-pr.outputs.pull-request-number }}
+          merge-method: squash
