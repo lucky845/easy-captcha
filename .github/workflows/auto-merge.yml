@@ -7,13 +7,15 @@ on:
 jobs:
   automerge:
     runs-on: ubuntu-latest
-    if: github.event.pull_request.labels.*.name contains 'dependencies'
+    if: contains(join(github.event.pull_request.labels.*.name, ','), 'dependencies')
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Enable GitHub auto-merge
-        uses: peter-evans/enable-pull-request-automerge@v3
+      - name: Enable Auto-Merge
+        if: steps.create-pr.outputs.pull-request-number != ''
+        uses: peter-evans/enable-pull-request-automerge@v2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          pull-request-number: ${{ steps.create-pr.outputs.pull-request-number }}
           merge-method: squash
