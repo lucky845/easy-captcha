@@ -23,7 +23,7 @@
 
         <netty.version>4.2.6.Final</netty.version>
         <json-smart.version>2.6.0</json-smart.version>
-        <xmlunit-core.version>2.10.4</xmlunit-core.version>
+        <xmlunit-core.version>2.11.0</xmlunit-core.version>
     </properties>
 
     <dependencies>
