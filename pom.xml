@@ -57,7 +57,7 @@
         <!-- plugins version -->
         <maven.compiler.plugin.version>3.14.1</maven.compiler.plugin.version>
         <maven.resource.plugin.version>3.3.1</maven.resource.plugin.version>
-        <maven.jar.plugin.version>3.4.2</maven.jar.plugin.version>
+        <maven.jar.plugin.version>3.5.0</maven.jar.plugin.version>
         <maven.surefire.plugin.version>3.5.4</maven.surefire.plugin.version>
         <maven.spring.boot.plugin.version>3.4.1</maven.spring.boot.plugin.version>
         <maven.versions.plugin.version>2.19.1</maven.versions.plugin.version>
