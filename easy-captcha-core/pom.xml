@@ -14,13 +14,7 @@
     <artifactId>easy-captcha-core</artifactId>
 
     <name>${project.artifactId}</name>
-    <description>核心模块</description>
-
-    <properties>
-        <maven.compiler.source>21</maven.compiler.source>
-        <maven.compiler.target>21</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
+    <description>验证码核心模块，无框架依赖</description>
 
     <dependencies>
 
@@ -28,6 +22,12 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
         </dependency>
 
     </dependencies>

@@ -1,0 +1,99 @@
+{
+  "groups": [
+    {
+      "name": "easy-captcha.behavior",
+      "type": "io.github.lucky845.basic.captcha.properties.BehaviorProperties",
+      "sourceType": "io.github.lucky845.basic.captcha.properties.CaptchaProperties",
+      "description": "行为验证码（滑块 / 点选）的可调阈值。默认全部是宽容档：宁可漏放，不可误杀。"
+    },
+    {
+      "name": "easy-captcha.behavior.drag",
+      "type": "io.github.lucky845.basic.captcha.properties.BehaviorProperties$Drag",
+      "sourceType": "io.github.lucky845.basic.captcha.properties.BehaviorProperties",
+      "sourceMethod": "getDrag()",
+      "description": "拖动型（滑块）阈值。"
+    },
+    {
+      "name": "easy-captcha.behavior.click",
+      "type": "io.github.lucky845.basic.captcha.properties.BehaviorProperties$Click",
+      "sourceType": "io.github.lucky845.basic.captcha.properties.BehaviorProperties",
+      "sourceMethod": "getClick()",
+      "description": "点击型（点选）阈值。点选只有离散坐标，点数、方向、弯曲度均不参与判定。"
+    }
+  ],
+  "properties": [
+    {
+      "name": "easy-captcha.behavior.drag.min-duration-ms",
+      "type": "java.lang.Long",
+      "sourceType": "io.github.lucky845.basic.captcha.properties.BehaviorProperties$Drag",
+      "defaultValue": 0,
+      "description": "拖动最短耗时（毫秒）。默认 0 = 不设下限。耗时主要由网络决定，与是否机器人无关，设置下限会误杀快手用户与内网部署。"
+    },
+    {
+      "name": "easy-captcha.behavior.drag.max-duration-ms",
+      "type": "java.lang.Long",
+      "sourceType": "io.github.lucky845.basic.captcha.properties.BehaviorProperties$Drag",
+      "defaultValue": 300000,
+      "description": "拖动最长耗时（毫秒）。默认 5 分钟，用于拦截挂机很久后再重放的场景。"
+    },
+    {
+      "name": "easy-captcha.behavior.drag.min-points",
+      "type": "java.lang.Integer",
+      "sourceType": "io.github.lucky845.basic.captcha.properties.BehaviorProperties$Drag",
+      "defaultValue": 1,
+      "description": "拖动最少轨迹点数。默认 1 = 不限制，因为低采样率设备常常只上报终端点。"
+    },
+    {
+      "name": "easy-captcha.behavior.drag.monotonic-tolerance",
+      "type": "java.lang.Integer",
+      "sourceType": "io.github.lucky845.basic.captcha.properties.BehaviorProperties$Drag",
+      "defaultValue": 60,
+      "description": "允许的 X 方向回退像素。默认 60，允许用户拖过头再拉回来。调小可拦截来回试探的脚本。"
+    },
+    {
+      "name": "easy-captcha.behavior.drag.check-curvature",
+      "type": "java.lang.Boolean",
+      "sourceType": "io.github.lucky845.basic.captcha.properties.BehaviorProperties$Drag",
+      "defaultValue": false,
+      "description": "是否启用弯曲度检查。默认关闭，因为真人拖直线是常态，开启会误杀。高风险场景可打开。"
+    },
+    {
+      "name": "easy-captcha.behavior.drag.min-curvature",
+      "type": "java.lang.Double",
+      "sourceType": "io.github.lucky845.basic.captcha.properties.BehaviorProperties$Drag",
+      "defaultValue": 1.005,
+      "description": "弯曲度下限，仅在 check-curvature=true 时生效。1.0 表示完全笔直。"
+    },
+    {
+      "name": "easy-captcha.behavior.click.min-duration-ms",
+      "type": "java.lang.Long",
+      "sourceType": "io.github.lucky845.basic.captcha.properties.BehaviorProperties$Click",
+      "defaultValue": 0,
+      "description": "点选最短耗时（毫秒）。默认 0 = 不设下限。"
+    },
+    {
+      "name": "easy-captcha.behavior.click.max-duration-ms",
+      "type": "java.lang.Long",
+      "sourceType": "io.github.lucky845.basic.captcha.properties.BehaviorProperties$Click",
+      "defaultValue": 300000,
+      "description": "点选最长耗时（毫秒）。"
+    },
+    {
+      "name": "easy-captcha.slider-width",
+      "type": "java.lang.Integer",
+      "defaultValue": 300,
+      "description": "滑块拼图专用宽度。滑块对尺寸敏感：块太小凸舌就看不清，用户无法判断是否对准。<=0 表示沿用全局 width。"
+    },
+    {
+      "name": "easy-captcha.slider-height",
+      "type": "java.lang.Integer",
+      "defaultValue": 150,
+      "description": "滑块拼图专用高度。建议与 slider-width 保持 2:1 左右。<=0 表示沿用全局 height。"
+    },
+    {
+      "name": "easy-captcha.slider-background",
+      "type": "java.lang.String",
+      "description": "自定义滑块底图的 classpath 路径（如 captcha/bg.jpg）。留空则用内置渐变底图。图片会缩放并居中裁剪到 slider-width × slider-height。"
+    }
+  ]
+}

@@ -36,3 +36,5 @@ build/
 
 ### Mac OS ###
 .DS_Store
+### 整个 IDE 目录不入库（workspace.xml 含个人状态）
+.idea/

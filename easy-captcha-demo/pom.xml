@@ -12,94 +12,51 @@
     <artifactId>easy-captcha-demo</artifactId>
 
     <name>${project.artifactId}</name>
-    <description>demo示例</description>
+    <description>验证码 starter 的示例工程</description>
 
     <properties>
-        <maven.compiler.source>21</maven.compiler.source>
-        <maven.compiler.target>21</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
         <maven.deploy.skip>true</maven.deploy.skip>
-
-        <netty.version>4.2.4.Final</netty.version>
-        <json-smart.version>2.6.0</json-smart.version>
-        <xmlunit-core.version>2.10.3</xmlunit-core.version>
     </properties>
 
     <dependencies>
 
         <dependency>
-            <groupId>io.netty</groupId>
-            <artifactId>netty-common</artifactId>
-            <scope>provided</scope>
-            <version>${netty.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>io.netty</groupId>
-            <artifactId>netty-handler</artifactId>
-            <scope>provided</scope>
-            <version>${netty.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-redis</artifactId>
-            <scope>provided</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>io.netty</groupId>
-                    <artifactId>netty-handler</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>io.netty</groupId>
-                    <artifactId>netty-common</artifactId>
-                </exclusion>
-            </exclusions>
+            <groupId>io.github.lucky845</groupId>
+            <artifactId>easy-captcha-spring-boot-starter</artifactId>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>io.github.lucky845</groupId>
-            <artifactId>easy-captcha-spring-boot-starter</artifactId>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>net.minidev</groupId>
-            <artifactId>json-smart</artifactId>
-            <scope>provided</scope>
-            <version>${json-smart.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.xmlunit</groupId>
-            <artifactId>xmlunit-core</artifactId>
-            <scope>provided</scope>
-            <version>${xmlunit-core.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>net.minidev</groupId>
-                    <artifactId>json-smart</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.xmlunit</groupId>
-                    <artifactId>xmlunit-core</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${maven.spring.boot.plugin.version}</version>
+                <configuration>
+                    <mainClass>io.github.lucky845.captcha.demo.CaptchaDemoApplication</mainClass>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

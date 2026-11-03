@@ -1,73 +1,113 @@
 package io.github.lucky845.basic.core.utils;
 
-import io.github.lucky845.basic.core.constants.Constants;
-
 import java.security.SecureRandom;
 
 /**
+ * 随机数工具类。
+ *
+ * <p>验证码是安全相关的随机值，必须使用密码学安全的随机源，否则可以被预测、被爆破。
+ * {@link SecureRandom} 内部有同步开销，因此每个线程持有独立实例，避免高并发下的锁竞争。
+ *
  * @author created by lucky845 on 2025-01-16
  */
-public class RandomUtils {
+public final class RandomUtils {
 
-    private static final SecureRandom SECURE_RANDOM;
-
-    static {
-        SECURE_RANDOM = new SecureRandom();
-        SECURE_RANDOM.setSeed(System.currentTimeMillis());
-    }
+    private static final ThreadLocal<SecureRandom> SECURE_RANDOM =
+            ThreadLocal.withInitial(SecureRandom::new);
 
     private RandomUtils() {
-        throw new AssertionError();
+        throw new IllegalStateException("Utility class");
     }
 
     /**
-     * 产生两个数之间的随机数
+     * 返回 [0, bound) 区间的随机整数。
      *
-     * @param min 最小值
-     * @param max 最大值
-     * @return 随机数
+     * @param bound 上界（不包含），必须大于 0
+     * @return 随机整数
      */
-    public static int num(int min, int max) {
-        return SECURE_RANDOM.nextInt(max - min) + min;
+    public static int nextInt(int bound) {
+        if (bound <= 0) {
+            throw new IllegalArgumentException("bound 必须大于 0，当前: " + bound);
+        }
+        return SECURE_RANDOM.get().nextInt(bound);
     }
 
     /**
-     * 产生0-max之间的随机数
+     * 返回 [min, max) 区间的随机整数。
      *
-     * @param max 最大值
+     * @param min 下界（包含）
+     * @param max 上界（不包含），必须大于 min
+     * @return 随机整数
      */
-    public static int num(int max) {
-        return SECURE_RANDOM.nextInt(max);
+    public static int nextInt(int min, int max) {
+        if (max <= min) {
+            throw new IllegalArgumentException(
+                    "max 必须大于 min，当前 min=" + min + ", max=" + max);
+        }
+        return min + SECURE_RANDOM.get().nextInt(max - min);
     }
 
     /**
-     * 返回CHARS中的随机字符
+     * 返回 [min, max] 闭区间的随机整数（两端都包含）。
      *
+     * @param min 下界
+     * @param max 上界
+     * @return 随机整数
+     */
+    public static int nextIntInclusive(int min, int max) {
+        if (max < min) {
+            throw new IllegalArgumentException(
+                    "max 必须大于等于 min，当前 min=" + min + ", max=" + max);
+        }
+        return min + SECURE_RANDOM.get().nextInt(max - min + 1);
+    }
+
+    /**
+     * 从字符数组中随机取一个字符。
+     *
+     * @param chars 字符数组
      * @return 随机字符
      */
-    public static char chars() {
-        return Constants.CHARS[num(Constants.CHARS.length)];
+    public static char randomChar(char[] chars) {
+        if (chars == null || chars.length == 0) {
+            throw new IllegalArgumentException("chars 不能为空");
+        }
+        return chars[nextInt(chars.length)];
     }
 
     /**
-     * 返回CHARS中第0位到第num位的随机字符
+     * 从数组中等概率取一个元素。
      *
-     * @param num 到第几位结束
-     * @return 随机字符
+     * @param values 数组
+     * @param <T>    元素类型
+     * @return 随机元素
      */
-    public static char chars(int num) {
-        return Constants.CHARS[num(num)];
+    public static <T> T pick(T[] values) {
+        if (values == null || values.length == 0) {
+            throw new IllegalArgumentException("values 不能为空");
+        }
+        return values[nextInt(values.length)];
     }
 
     /**
-     * 返回CHARS中第min位到第max位的随机字符
-     *
-     * @param min 从第几位开始
-     * @param max 到第几位结束
-     * @return 随机字符
+     * 返回 [0, 1) 的随机浮点数。
      */
-    public static char chars(int min, int max) {
-        return Constants.CHARS[num(min, max)];
+    public static double nextDouble() {
+        return SECURE_RANDOM.get().nextDouble();
     }
 
+    /**
+     * 以 {@code trueProbability} 的概率返回 true。
+     *
+     * @param trueProbability 概率，取值范围 [0, 1]
+     */
+    public static boolean chance(double trueProbability) {
+        if (trueProbability <= 0) {
+            return false;
+        }
+        if (trueProbability >= 1) {
+            return true;
+        }
+        return nextDouble() < trueProbability;
+    }
 }
