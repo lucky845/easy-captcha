@@ -291,11 +291,21 @@ public class CaptchaService {
 
     /**
      * 从结果里推断类型：行为验证码的 extra 中带有类型标记。
+     *
+     * <p>除了原生枚举，也接受字符串形式：自定义 {@code CaptchaStore} 或跨版本缓存
+     * 都可能把类型降级成字符串，这里不该因为载体不同就判成普通验证码。
      */
     private CaptchaTypeEnum expectedTypeOf(CaptchaResult result) {
         Object type = result.extra().get("captchaType");
         if (type instanceof CaptchaTypeEnum e) {
             return e;
+        }
+        if (type instanceof String s) {
+            try {
+                return CaptchaTypeEnum.valueOf(s);
+            } catch (IllegalArgumentException ignored) {
+                // 未知类型，继续按下面的兜底逻辑推断
+            }
         }
         if (result.extra().containsKey("slider")) {
             return CaptchaTypeEnum.SLIDER_CAPTCHA;

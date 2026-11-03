@@ -7,7 +7,7 @@
     <parent>
         <groupId>io.github.lucky845</groupId>
         <artifactId>easy-captcha</artifactId>
-        <version>1.0.3</version>
+        <version>1.0.4</version>
     </parent>
 
     <artifactId>easy-captcha-spring-boot-starter</artifactId>
@@ -25,6 +25,17 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-autoconfigure</artifactId>
+        </dependency>
+
+        <!--
+            Redis 支持是<b>可选</b>的：只有用户自己引入了 spring-boot-starter-data-redis
+            并且容器里有 StringRedisTemplate 时，RedisCaptchaStore 才会被注册。
+            标记 optional 保证这个依赖不会传递到用户的 classpath。
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+            <optional>true</optional>
         </dependency>
 
         <dependency>

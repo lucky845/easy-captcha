@@ -8,9 +8,9 @@
 [![Java](https://img.shields.io/badge/Java-21+-orange?logo=openjdk&logoColor=white)](https://openjdk.org/)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.x-6DB33F?logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
-[![Tests](https://img.shields.io/badge/tests-127%20passed-brightgreen)]()
+[![Tests](https://img.shields.io/badge/tests-143%20passed-brightgreen)]()
 
-[快速开始](#快速开始) · [验证码类型](#验证码类型) · [配置](#配置) · [核心-api](#核心-api) · [示例](#运行示例)
+[快速开始](#快速开始) · [验证码类型](#验证码类型) · [配置](#配置) · [核心 API](#核心-api) · [更新日志](CHANGELOG.md) · [示例](#运行示例)
 
 </div>
 
@@ -22,7 +22,7 @@
 - **生成器无状态。** `CaptchaConfig` → `CaptchaResult` 是纯函数，同一个实例可被任意线程并发调用，不会出现"全站共用一个验证码"。
 - **不误杀真人。** 行为校验默认宽容档，只拦"答案错"和"轨迹大幅横跳"。耗时下限默认关闭——被挡住的用户会直接流失。
 - **答案不泄漏给前端。** 下发给浏览器的只有背景图、拼图块、尺寸、提示文字，答案始终留在服务端。
-- **开箱即用。** Spring Boot 自动配置，不依赖 Redis 或任何外部服务。
+- **开箱即用。** Spring Boot 自动配置，零配置即可跑；单机用内存存储，项目里已有 Redis 时自动切换，多副本部署不会串。
 
 ## 验证码类型
 
@@ -46,7 +46,7 @@
 <dependency>
     <groupId>io.github.lucky845</groupId>
     <artifactId>easy-captcha-spring-boot-starter</artifactId>
-    <version>1.0.3</version>
+    <version>1.0.4</version>
 </dependency>
 ```
 
@@ -54,7 +54,7 @@
 <summary>Gradle</summary>
 
 ```groovy
-implementation 'io.github.lucky845:easy-captcha-spring-boot-starter:1.0.3'
+implementation 'io.github.lucky845:easy-captcha-spring-boot-starter:1.0.4'
 ```
 
 </details>
@@ -191,6 +191,7 @@ easy-captcha:
 
   ttl: 2m                          # 有效期
   max-entries: 10000               # 内存上限
+  redis-key-prefix: easy-captcha:  # 仅在启用 Redis 存储时生效
   rate-limit-permits: 60           # 窗口内签发次数，<=0 不限流
   rate-limit-window: 1m
 
@@ -289,16 +290,34 @@ public class MyCaptchaGenerator extends AbstractCaptchaGenerator {
 }
 ```
 
-### 自定义存储
+### 存储
 
-默认 `InMemoryCaptchaStore`。集群部署时提供 `CaptchaStore` Bean 即可：
+`CaptchaStore` 负责保存已签发但未校验的验证码。内置两个实现，**按类路径自动选择**：
+
+| 实现 | 生效条件 | 适用场景 |
+| :--- | :--- | :--- |
+| `InMemoryCaptchaStore` | 默认 | 单机、本地开发 |
+| `RedisCaptchaStore` | 类路径有 `spring-boot-starter-data-redis` **且** 容器里有 `StringRedisTemplate` | 多副本 / 集群部署 |
+
+也就是说：**只要你的项目本来就用了 Redis，什么都不用配**，多实例之间会自动共享验证码。
+
+Redis 实现做的事：
+
+- 一次性消费用 `GETDEL`（`getAndDelete`）原子完成，并发请求不会重复通过同一张验证码。
+- key 自带 TTL，过期由 Redis 自己回收，不依赖应用清理。
+- 值用长度前缀自描述格式序列化，**不用 JDK 反序列化**，不存在反序列化 gadget 风险。
+- `clear()` 用 `SCAN` 遍历而不是 `KEYS`，不会阻塞 Redis 主线程。
+
+自定义实现只需实现接口并注册为 Bean：
 
 ```java
 @Bean
-public CaptchaStore captchaStore(RedisTemplate<String, CaptchaResult> redis) {
-    return new RedisCaptchaStore(redis);
+public CaptchaStore captchaStore() {
+    return new MyCaptchaStore();
 }
 ```
+
+> 集群部署却仍然用内存存储，是这套组件最容易踩的坑：A 实例签发的验证码，被负载均衡打到 B 实例校验时必然失败。
 
 ## 运行示例
 
@@ -338,6 +357,8 @@ mvn clean install    # 安装到本地仓库
 | `BehaviorCaptchaTest` | 15 | 滑块/点选端到端、限流、票据、误杀回归 |
 | `BehaviorConfigurationTest` | 11 | 阈值配置生效、默认宽容档 |
 | `InMemoryCaptchaStoreTest` | 7 | TTL、容量、边界 |
+| `RedisCaptchaStoreTest` | 11 | 序列化往返、GETDEL 一次性、TTL、损坏数据 |
+| `CaptchaStoreAutoconfigurationTest` | 5 | 有/无 Redis 时的存储选择、自定义覆盖 |
 | `DemoControllerTest` | 15 | HTTP 全链路、答案不泄露 |
 
 ## 环境要求
@@ -351,7 +372,7 @@ GitHub Dependabot 会报出若干告警，需要说明的是：
 
 - 告警**全部来自 `easy-captcha-demo` 模块的传递依赖**（tomcat、spring-webmvc、jackson、netty 等），因为 demo 是一个完整的 Spring Boot Web 示例工程。
 - `easy-captcha-core` 与 `easy-captcha-spring-boot-starter` 本身依赖很干净：core 只依赖 `java.desktop`，starter 只依赖 `spring-boot-autoconfigure`。
-- 引入本库**不会**把 demo 的依赖带进你的项目——demo 已设置 `maven.deploy.skip=true`，不参与发布。
+- 引入本库**不会**把 demo 的依赖带进你的项目——发布时通过 `central-publishing-maven-plugin` 的 `excludeArtifacts` 排除了 demo 模块。
 
 ## 贡献
 

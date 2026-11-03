@@ -138,6 +138,14 @@ public class CaptchaProperties {
 
 
     /**
+     * 启用 Redis 存储时使用的 key 前缀。
+     *
+     * <p>只有检测到 {@code StringRedisTemplate} 才会启用 Redis 存储；
+     * 前缀用于和同一 Redis 里的其它业务隔离，例如 {@code easy-captcha:}。
+     */
+    private String redisKeyPrefix = "easy-captcha:";
+
+    /**
      * 限流窗口内允许的签发次数，<= 0 表示不限流
      */
     private int rateLimitPermits = 60;

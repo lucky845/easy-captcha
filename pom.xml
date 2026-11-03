@@ -7,7 +7,7 @@
 
     <groupId>io.github.lucky845</groupId>
     <artifactId>easy-captcha</artifactId>
-    <version>1.0.3</version>
+    <version>1.0.4</version>
 
     <modules>
         <module>easy-captcha-core</module>
@@ -73,6 +73,11 @@
         -->
         <spring-boot.version>3.5.16</spring-boot.version>
         <lombok.version>1.18.46</lombok.version>
+
+        <!-- 安全修复：覆盖 BOM 中滞后的传递依赖版本 -->
+        <tomcat.version>10.1.59</tomcat.version>
+        <jackson.version>2.21.7</jackson.version>
+        <log4j.version>2.25.5</log4j.version>
     </properties>
 
     <dependencyManagement>
@@ -110,6 +115,61 @@
                 <artifactId>lombok</artifactId>
                 <version>${lombok.version}</version>
                 <scope>provided</scope>
+            </dependency>
+
+            <!--
+                以下覆盖 spring-boot-dependencies BOM 里滞后于安全修复的传递依赖。
+                BOM 只是"推荐的默认版本"，允许在此上调；升级 BOM 本身不够，
+                因为 3.5.16 是当前最新的 3.5.x，但它锁定的 tomcat/jackson/log4j
+                仍低于 Dependabot 建议的修复版本。
+
+                待 Spring Boot 官方跟进后，这些覆盖可以移除。
+            -->
+            <dependency>
+                <groupId>org.apache.tomcat.embed</groupId>
+                <artifactId>tomcat-embed-core</artifactId>
+                <version>${tomcat.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.tomcat.embed</groupId>
+                <artifactId>tomcat-embed-el</artifactId>
+                <version>${tomcat.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.tomcat.embed</groupId>
+                <artifactId>tomcat-embed-websocket</artifactId>
+                <version>${tomcat.version}</version>
+            </dependency>
+            <!--
+                jackson / log4j 不能用 bom import 覆盖：
+                import 的 bom 优先级低于 spring-boot-dependencies，
+                必须逐个 artifact 直接声明版本才生效。
+            -->
+            <!--
+                只覆盖有漏洞的 jackson 模块。
+                jackson-annotations 的版本线与 databind/core 不同步
+                （annotations 最新只到 2.19.x），强行统一会让解析失败。
+                其余模块沿用 BOM 里的版本，由 Maven 按最近原则调解。
+            -->
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-core</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-api</artifactId>
+                <version>${log4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-to-slf4j</artifactId>
+                <version>${log4j.version}</version>
             </dependency>
 
         </dependencies>
