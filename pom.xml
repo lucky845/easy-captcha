@@ -64,6 +64,7 @@
         <maven.javadoc.plugin.version>3.12.0</maven.javadoc.plugin.version>
         <maven.source.plugin.version>2.4</maven.source.plugin.version>
         <maven.deploy.plugin.version>3.1.4</maven.deploy.plugin.version>
+        <maven.gpg.plugin.version>3.2.8</maven.gpg.plugin.version>
 
         <!--
             依赖版本优先交给 spring-boot-dependencies BOM 管理。
@@ -388,17 +389,18 @@
     <profiles>
 
         <!--
-            develop 只是默认激活的开发 profile，仓库已在 <repositories> 全局声明，
-            这里不再重复定义，避免同一 id 出现两处配置而产生歧义。
+            开发用 profile：仅在未显式指定其它 profile 时激活。
+
+            注意：不要在这里设置 <maven.deploy.skip>true</maven.deploy.skip>。
+            activeByDefault 的 profile 在所有未指定 -P 的构建里都会生效，
+            那样连 mvn deploy 都会被静默跳过，等于把发布功能关掉。
+            是否跳过部署应通过命令行 -Dmaven.deploy.skip=true 显式控制。
         -->
         <profile>
             <id>develop</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
-            <properties>
-                <maven.deploy.skip>true</maven.deploy.skip>
-            </properties>
         </profile>
 
         <profile>
@@ -471,11 +473,11 @@
                         </executions>
                     </plugin>
 
-                    <!-- GPG -->
+                    <!-- GPG：为产物生成 .asc 签名，Central 强制要求 -->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
-                        <version>3.2.8</version>
+                        <version>${maven.gpg.plugin.version}</version>
                         <executions>
                             <execution>
                                 <id>sign-artifacts</id>
@@ -485,12 +487,22 @@
                                 </goals>
                             </execution>
                         </executions>
-                        <!--                        <configuration>-->
-                        <!--                            <gpgArguments>-->
-                        <!--                                <arg>&#45;&#45;pinentry-mode</arg>-->
-                        <!--                                <arg>loopback</arg>-->
-                        <!--                            </gpgArguments>-->
-                        <!--                        </configuration>-->
+                        <configuration>
+                            <!--
+                                loopback 让 gpg 从标准输入读取口令，而不是尝试打开
+                                终端 pinentry。CI 或非交互 shell 里没有 tty，
+                                不加这个参数会报 "Inappropriate ioctl for device"。
+
+                                口令用环境变量提供（maven-gpg-plugin 官方推荐）：
+                                  export MAVEN_GPG_PASSPHRASE='你的口令'
+                                  mvn deploy -P release
+                                不要用 -Dgpg.passphrase=xxx，该方式已废弃且会泄漏到进程列表。
+                            -->
+                            <gpgArguments>
+                                <arg>--pinentry-mode</arg>
+                                <arg>loopback</arg>
+                            </gpgArguments>
+                        </configuration>
                     </plugin>
 
                     <!--用于与 center 仓库进行集成，方便在 Maven 构建过程中进行部署和发布操作-->
