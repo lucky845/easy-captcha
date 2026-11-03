@@ -67,18 +67,11 @@
 
         <!-- dependencies version -->
         <lombok.version>1.18.38</lombok.version>
-        <spring-boot.version>3.5.5</spring-boot.version>
-        <transmittable-thread-local.version>2.14.5</transmittable-thread-local.version>
+        <spring-boot.version>3.5.16</spring-boot.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
-
-            <dependency>
-                <groupId>com.alibaba</groupId>
-                <artifactId>transmittable-thread-local</artifactId>
-                <version>${transmittable-thread-local.version}</version>
-            </dependency>
 
             <!-- 依赖管理 -->
             <dependency>
@@ -145,12 +138,29 @@
     <build>
         <finalName>${project.artifactId}</finalName>
         <resources>
+            <!-- 文本资源做变量替换 -->
             <resource>
                 <directory>src/main/resources</directory>
                 <includes>
-                    <include>**/*</include>
+                    <include>**/*.yml</include>
+                    <include>**/*.yaml</include>
+                    <include>**/*.properties</include>
+                    <include>**/*.imports</include>
+                    <include>**/*.json</include>
                 </includes>
                 <filtering>true</filtering>
+            </resource>
+            <!-- 其余资源（字体、META-INF 等）原样复制，避免二进制被当文本处理 -->
+            <resource>
+                <directory>src/main/resources</directory>
+                <excludes>
+                    <exclude>**/*.yml</exclude>
+                    <exclude>**/*.yaml</exclude>
+                    <exclude>**/*.properties</exclude>
+                    <exclude>**/*.imports</exclude>
+                    <exclude>**/*.json</exclude>
+                </excludes>
+                <filtering>false</filtering>
             </resource>
             <resource>
                 <directory>src/main/java</directory>
@@ -234,25 +244,22 @@
                             <!--                                这个地方，用空格隔开就行 &ndash;&gt;-->
                             <!--                            </manifestEntries>-->
                         </archive>
-                        <!-- jar包的位置 -->
-                        <!--                        <outputDirectory>${project.build.directory}/lib</outputDirectory>-->
-                        <includes>
-                            <!-- 打jar包时，打包class文件和config目录下面的 properties文件 -->
-                            <!-- 有时候可能需要一些其他文件，这边可以配置，包括剔除的文件等等 -->
-                            <include>**/*.class</include>
-                            <include>**/*.properties</include>
-                        </includes>
+                        <!--
+                            注意：这里曾经用 <includes> 白名单只放行 **/*.class 与 **/*.properties，
+                            结果把 META-INF/spring/...AutoConfiguration.imports 和 classpath 下的字体
+                            全部挡在 jar 之外，打出来的 starter 是无法自动装配的空壳。
+                            jar 内容交给 resources 阶段的过滤规则决定，不再二次裁剪。
+                        -->
                     </configuration>
                 </plugin>
 
                 <plugin>
-                    <!--打包跳过测试-->
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>${maven.surefire.plugin.version}</version>
                     <configuration>
-                        <skipTests>true</skipTests>
-                        <skip>true</skip>
+                        <!-- 默认跑测试；需要跳过时用 -DskipTests -->
+                        <argLine>-Djava.awt.headless=true</argLine>
                     </configuration>
                 </plugin>
 
@@ -324,20 +331,25 @@
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
+                    <!--
+                        显式声明注解处理器路径后，Maven 不会再去 classpath 自动发现处理器，
+                        所以 Spring Boot 的配置元数据处理器必须在这里一起列出，
+                        否则 @ConfigurationProperties 不会产出 spring-configuration-metadata.json，
+                        IDE 里也就没有属性补全。
+                    -->
                     <annotationProcessorPaths>
                         <path>
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
                             <version>${lombok.version}</version>
                         </path>
+                        <path>
+                            <groupId>org.springframework.boot</groupId>
+                            <artifactId>spring-boot-configuration-processor</artifactId>
+                            <version>${spring.boot.version}</version>
+                        </path>
                     </annotationProcessorPaths>
                 </configuration>
-            </plugin>
-
-            <plugin>
-                <!--打包跳过测试-->
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
             </plugin>
 
             <!-- 资源插件 -->

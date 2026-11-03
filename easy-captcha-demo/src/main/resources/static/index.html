@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Easy Captcha 演示</title>
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", sans-serif;
+            background: #0C1216;
+            color: #E6EDF3;
+            margin: 0;
+            padding: 32px 16px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .card {
+            background: #141C22;
+            border: 1px solid #223039;
+            border-radius: 12px;
+            padding: 28px;
+            width: min(480px, 100%);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, .45);
+        }
+
+        h1 { font-size: 18px; font-weight: 600; margin: 0 0 4px; color: #4EC2C6; }
+        .sub { font-size: 13px; color: #7D8E99; margin-bottom: 22px; }
+
+        label { font-size: 12px; color: #7D8E99; display: block; margin-bottom: 6px; }
+
+        select, input[type=text] {
+            width: 100%;
+            background: #0C1216;
+            border: 1px solid #223039;
+            color: #E6EDF3;
+            border-radius: 6px;
+            padding: 10px 12px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        select:focus, input[type=text]:focus { border-color: #4EC2C6; }
+
+        .field { margin-bottom: 14px; }
+
+        /* 容器宽度跟随图片，而不是撑满父级。
+           写成 width:100% 时容器会随卡片变成 422px，而图只有 300px，
+           右侧就会露出一片白底——看起来像"底图被缩放了"。
+           用 inline-block + 宽度自适应，容器尺寸恒等于图片尺寸。 */
+        .captcha-box {
+            position: relative;
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            /* 不用 flex 居中：拼图块用 absolute 定位，必须和图片严格同一坐标系，
+               一旦图片被居中偏移，滑块就会与缺口错位，用户永远对不准 */
+            display: inline-block;
+            vertical-align: top;
+            line-height: 0;
+            cursor: pointer;
+            align-self: flex-start;
+        }
+
+        /* 主图按原始像素显示，不做拉伸：
+           一旦图片被 CSS 缩放，拼图块、缺口、鼠标坐标三者就要额外套一层换算，
+           任何一处写反都会表现为"滑块和缺口对不上"。
+           保持 1:1 显示，整套坐标换算就退化成纯平移，最不容易出错。
+           容器窄于图片时才等比缩小，此时由 JS 按实际显示宽度重新计算比例。 */
+        #captchaImage { display: block; width: auto; height: auto; max-width: 100%; }
+
+        .hint {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(12, 18, 22, .82);
+            color: #E6EDF3;
+            font-size: 13px;
+            letter-spacing: .3px;
+        }
+
+        /* 滑块 */
+        .slider-wrap {
+            position: relative;
+            height: 44px;
+            background: #0C1216;
+            border: 1px solid #223039;
+            border-radius: 8px;
+            margin-top: 12px;
+            user-select: none;
+            overflow: hidden;
+        }
+
+        .slider-fill {
+            position: absolute;
+            inset: 0 auto 0 0;
+            width: 0;
+            background: linear-gradient(90deg, rgba(78, 194, 198, .28), rgba(78, 194, 198, .12));
+            border-right: 2px solid #4EC2C6;
+        }
+
+        .slider-handle {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 38px;
+            height: 36px;
+            background: #4EC2C6;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #06232A;
+            font-weight: 700;
+            cursor: grab;
+            touch-action: none;
+            z-index: 2;
+        }
+
+        .slider-handle:active { cursor: grabbing; }
+
+        .slider-text {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            color: #5A6C78;
+            pointer-events: none;
+        }
+
+        /* 点选 */
+        /* 拼图块由 JS 按 displayScale 设置精确像素尺寸，不受上面的 max-width 影响 */
+        #captchaBox img.block-piece { max-width: none; }
+
+        .click-layer {
+            position: absolute;
+            inset: 0;
+            cursor: crosshair;
+        }
+
+        .click-dot {
+            position: absolute;
+            width: 26px;
+            height: 26px;
+            margin: -13px 0 0 -13px;
+            border-radius: 50%;
+            background: rgba(78, 194, 198, .85);
+            color: #06232A;
+            font-size: 12px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+        }
+
+        .prompt {
+            font-size: 14px;
+            margin: 14px 0 8px;
+            color: #A8B8C2;
+        }
+
+        .prompt strong {
+            color: #4EC2C6;
+            font-size: 20px;
+            letter-spacing: 6px;
+            margin-left: 6px;
+        }
+
+        .buttons { display: flex; gap: 10px; margin-top: 16px; }
+
+        button {
+            flex: 1;
+            border: 0;
+            border-radius: 6px;
+            padding: 11px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: opacity .15s;
+        }
+
+        button:hover { opacity: .85; }
+        button:disabled { opacity: .4; cursor: not-allowed; }
+
+        .primary { background: #4EC2C6; color: #06232A; font-weight: 600; }
+        .ghost { background: #1B262D; color: #A8B8C2; }
+
+        #status {
+            margin-top: 14px;
+            font-size: 13px;
+            min-height: 34px;
+            line-height: 1.5;
+            padding: 8px 10px;
+            border-radius: 6px;
+            word-break: break-all;
+        }
+
+        #status.ok { color: #4EC2C6; background: rgba(78, 194, 198, .08); }
+        #status.err { color: #E06C75; background: rgba(224, 108, 117, .08); }
+        #status.info { color: #A8B8C2; background: rgba(168, 184, 194, .06); }
+
+        .meta { font-size: 11px; color: #4A5A66; margin-top: 16px; line-height: 1.7; }
+        .meta code { color: #6E8A96; }
+    </style>
+</head>
+<body>
+<div class="card">
+    <h1>Easy Captcha</h1>
+    <div class="sub">7 种类型 · 行为轨迹校验 · 二次校验令牌</div>
+
+    <div class="field">
+        <label for="typeSelect">验证码类型</label>
+        <select id="typeSelect">
+            <option value="PNG_CAPTCHA">PNG 字符</option>
+            <option value="GIF_CAPTCHA">GIF 字符</option>
+            <option value="CHINESE_CAPTCHA">中文 PNG</option>
+            <option value="CHINESE_GIF_CAPTCHA">中文 GIF</option>
+            <option value="ARITHMETIC_CAPTCHA">算术题</option>
+            <option value="SLIDER_CAPTCHA" selected>滑块拼图（行为）</option>
+            <option value="CLICK_WORD_CAPTCHA">文字点选（行为）</option>
+        </select>
+    </div>
+
+    <div class="captcha-box" id="captchaBox">
+        <img id="captchaImage" alt="" style="display:none"/>
+        <div class="hint" id="hint">加载中…</div>
+        <div class="click-layer" id="clickLayer" style="display:none"></div>
+    </div>
+
+    <!-- 滑块条 -->
+    <div class="slider-wrap" id="sliderWrap" style="display:none">
+        <div class="slider-fill" id="sliderFill"></div>
+        <div class="slider-text">向右拖动滑块补全拼图</div>
+        <div class="slider-handle" id="sliderHandle">→</div>
+    </div>
+
+    <!-- 点选提示 -->
+    <div class="prompt" id="promptBox" style="display:none">
+        请依次点击：<strong id="promptChars"></strong>
+    </div>
+
+    <div class="field" id="answerField">
+        <label for="answer">验证码 / 计算结果</label>
+        <input id="answer" type="text" placeholder="请输入" autocomplete="off"/>
+    </div>
+
+    <div class="buttons">
+        <button class="ghost" onclick="refresh()">换一张</button>
+        <button class="primary" id="submitBtn" onclick="submit()">校验</button>
+    </div>
+
+    <div id="status"></div>
+
+    <div class="meta">
+        静态类型走 <code>POST /captcha/validate</code>；
+        行为类型走 <code>POST /captcha/validate/behavior</code>，同时校验答案与鼠标轨迹；
+        通过后可用 <code>POST /captcha/validate/ticket</code> 换令牌。
+    </div>
+</div>
+
+<script>
+    const el = id => document.getElementById(id);
+    const typeEl = el('typeSelect');
+    const imgEl = el('captchaImage');
+    const hintEl = el('hint');
+    const boxEl = el('captchaBox');
+    const clickLayer = el('clickLayer');
+    const sliderWrap = el('sliderWrap');
+    const sliderFill = el('sliderFill');
+    const sliderHandle = el('sliderHandle');
+    const promptBox = el('promptBox');
+    const promptChars = el('promptChars');
+    const answerField = el('answerField');
+    const answerEl = el('answer');
+    const statusEl = el('status');
+    const submitBtn = el('submitBtn');
+
+    let current = null;      // { id, type, extra }
+    let trajectory = [];     // 轨迹点
+    let startTime = 0;
+
+    // ---- 滑块相关状态（统一放在这里，避免 let 暂时性死区）----
+    let dragging = false;
+    let dragStartX = 0;
+    let blockEl = null;          // 可拖动的拼图块
+    let maxHandleTravel = 0;     // 手柄在滑块条上的最大位移
+    let displayScale = 1;        // 原图 → 显示 的缩放比
+
+    const BEHAVIOR = new Set(['SLIDER_CAPTCHA', 'CLICK_WORD_CAPTCHA']);
+
+    function setStatus(text, kind = 'info') {
+        statusEl.textContent = text;
+        statusEl.className = kind;
+    }
+
+    function isBehavior() {
+        return current && BEHAVIOR.has(current.type);
+    }
+
+    async function refresh() {
+        const type = typeEl.value;
+        resetInteraction();
+        setStatus('加载中…', 'info');
+        hintEl.textContent = '加载中…';
+        hintEl.style.display = 'flex';
+        imgEl.style.display = 'none';
+
+        try {
+            const resp = await fetch('/captcha/base64?type=' + encodeURIComponent(type), {cache: 'no-store'});
+            if (!resp.ok) {
+                if (resp.status === 429) {
+                    const err = await resp.json().catch(() => ({}));
+                    throw new Error(err.message || '请求太频繁，请稍后再试');
+                }
+                throw new Error('HTTP ' + resp.status);
+            }
+            const data = await resp.json();
+            current = {id: data.id, type: data.type, extra: data};
+
+            // 用 onload 属性赋值会覆盖前一次的回调，但更麻烦的是：
+            // data URI 常被浏览器缓存，onload 可能**不会**再次触发，
+            // 导致 setupSlider 不执行、页面上残留上一张的拼图块。
+            // 因此这里同时挂一次性和兜底检查。
+            const onReady = () => {
+                imgEl.style.display = 'block';
+                hintEl.style.display = 'none';
+                if (data.type === 'SLIDER_CAPTCHA') {
+                    setupSlider(data);
+                } else if (data.type === 'CLICK_WORD_CAPTCHA') {
+                    setupClick(data);
+                }
+            };
+
+            let settled = false;
+            const settleOnce = () => {
+                if (settled) return;
+                settled = true;
+                onReady();
+            };
+            imgEl.onload = settleOnce;
+            imgEl.src = data.image;
+
+            // 数据 URI 可能同步完成解码，onload 不会再触发，主动兜一次
+            requestAnimationFrame(() => {
+                if (imgEl.complete && imgEl.naturalWidth > 0) {
+                    settleOnce();
+                }
+            });
+
+            if (BEHAVIOR.has(data.type)) {
+                answerField.style.display = 'none';
+                submitBtn.textContent = data.type === 'SLIDER_CAPTCHA' ? '拖动完成后自动校验' : '点击完成后自动校验';
+            } else {
+                answerField.style.display = '';
+                submitBtn.textContent = '校验';
+                answerEl.value = '';
+                answerEl.focus();
+            }
+            setStatus('已生成 · id=' + data.id.slice(0, 8) + '…', 'info');
+        } catch (e) {
+            setStatus('加载失败：' + e.message, 'err');
+            hintEl.textContent = '加载失败';
+        }
+    }
+
+    function resetInteraction() {
+        current = null;
+        trajectory = [];
+        startTime = 0;
+        dragging = false;
+        clickLayer.innerHTML = '';
+        clickLayer.style.display = 'none';
+        sliderWrap.style.display = 'none';
+        promptBox.style.display = 'none';
+        sliderFill.style.width = '0';
+        sliderHandle.style.left = '3px';
+        // 清掉上一张的拼图块，避免残留到新图上
+        if (blockEl) {
+            blockEl.remove();
+            blockEl = null;
+        }
+    }
+
+    /* ---------------- 滑块 ---------------- */
+
+    function setupSlider(data) {
+        sliderWrap.style.display = 'block';
+        sliderFill.style.width = '0';
+        sliderHandle.style.left = '3px';
+        dragging = false;
+        trajectory = [];
+
+        // 尺寸测量必须同时等两个条件：图片已加载（拿到 clientWidth）
+        // 且滑块条已布局（display:block 生效后才量得到宽度）。
+        // 任何一个为 0 都会导致 maxHandleTravel=0，滑块拖不动。
+        const measure = () => {
+            const wrapWidth = sliderWrap.clientWidth;
+            const imgWidth = imgEl.clientWidth;
+            if (!wrapWidth || !imgWidth) {
+                // 布局还没好，下一帧再试
+                requestAnimationFrame(measure);
+                return;
+            }
+            maxHandleTravel = Math.max(1, wrapWidth - sliderHandle.offsetWidth - 6);
+            // 原图 → 显示：显示更宽时 > 1
+            displayScale = current && current.extra.imageWidth > 0
+                ? imgWidth / current.extra.imageWidth
+                : 1;
+            drawBlockOverlay(data);
+        };
+        // 先把滑块条显示出来，否则 clientWidth 恒为 0
+        requestAnimationFrame(measure);
+    }
+
+    /**
+     * 把"手柄在滑块条上的位移"换算成"图片上的位移。
+     *
+     * 滑块条宽度与图片宽度通常不相等，因此不能用同一个位移值，
+     * 必须按比例映射，否则用户把图对准了、提交的坐标却是错的。
+     */
+    function handleTravelToImageDelta(travelPx) {
+        const ratio = maxHandleTravel > 0 ? travelPx / maxHandleTravel : 0;
+        // 注意：换算到"原图坐标"，所以用原图的最大可移动距离，
+        // 不要再乘 imgScale——手柄位移已经是显示像素，双层缩放会让结果整体偏小。
+        const imageMaxDelta = current.extra.imageWidth - current.extra.blockWidth;
+        return Math.round(ratio * imageMaxDelta);
+    }
+
+    /**
+     * 反向映射：图片上的目标位移 → 手柄应该移动多少
+     */
+    function imageDeltaToHandleTravel(imageDelta) {
+        const imageMaxDelta = current.extra.imageWidth - current.extra.blockWidth;
+        if (imageMaxDelta <= 0) return 0;
+        return Math.round((imageDelta / imageMaxDelta) * maxHandleTravel);
+    }
+
+    function drawBlockOverlay(data) {
+        if (blockEl) blockEl.remove();
+        const scale = displayScale > 0 ? displayScale : 1;
+        blockEl = document.createElement('img');
+        blockEl.src = data.slider.block;
+        blockEl.className = 'block-piece';
+        blockEl.style.position = 'absolute';
+        // 每次都从最左侧起画。上一轮拖动会把 left 改掉，
+        // 若这里不归零，新的一块会出现在旧位置上——用户看到的就是"滑块不见了"
+        blockEl.style.left = '0px';
+        // 原图尺寸 × displayScale = 应显示的像素尺寸，
+        // 这样滑块的视觉大小才和背景图上的缺口完全一致
+        blockEl.style.top = (data.blockY * scale) + 'px';
+        blockEl.style.width = (data.blockWidth * scale) + 'px';
+        blockEl.style.height = (data.blockHeight * scale) + 'px';
+        blockEl.style.pointerEvents = 'none';
+        boxEl.appendChild(blockEl);
+    }
+
+    sliderHandle.addEventListener('pointerdown', e => {
+        if (!current || current.type !== 'SLIDER_CAPTCHA') return;
+        dragging = true;
+        dragStartX = e.clientX;
+        startTime = Date.now();
+        trajectory = [{x: 0, y: 0, t: 0}];
+        sliderHandle.setPointerCapture(e.pointerId);
+    });
+
+    sliderHandle.addEventListener('pointermove', e => {
+        if (!dragging) return;
+        const travel = Math.max(0, Math.min(maxHandleTravel, e.clientX - dragStartX));
+        sliderHandle.style.left = (travel + 3) + 'px';
+        sliderFill.style.width = (travel + 41) + 'px';
+
+        // 手柄位移 → 原图坐标位移 → 页面像素位移
+        const imageDelta = handleTravelToImageDelta(travel);
+        if (blockEl) {
+            blockEl.style.left = (imageDelta * displayScale) + 'px';
+        }
+
+        trajectory.push({
+            x: imageDelta,
+            y: Math.round(e.clientY - boxEl.getBoundingClientRect().top),
+            t: Date.now() - startTime
+        });
+    });
+
+    sliderHandle.addEventListener('pointerup', e => {
+        if (!dragging) return;
+        dragging = false;
+        const travel = Math.max(0, Math.min(maxHandleTravel, e.clientX - dragStartX));
+        // 提交的是**图片坐标**，与服务端答案同一坐标系
+        submitBehavior(handleTravelToImageDelta(travel));
+    });
+
+    /* ---------------- 点选 ---------------- */
+
+    let clicks = [];
+
+    function setupClick(data) {
+        promptBox.style.display = 'block';
+        promptChars.textContent = data.prompt || '';
+        clicks = [];
+        trajectory = [];
+        startTime = Date.now();
+        clickLayer.innerHTML = '';
+        clickLayer.style.display = 'block';
+        clickLayer.onclick = onClickLayer;
+    }
+
+    function onClickLayer(e) {
+        if (!current || current.type !== 'CLICK_WORD_CAPTCHA') return;
+        const rect = imgEl.getBoundingClientRect();
+        const scale = current.extra.imageWidth / rect.width;
+        const x = Math.round((e.clientX - rect.left) * scale);
+        const y = Math.round((e.clientY - rect.top) * scale);
+
+        clicks.push({x, y});
+        trajectory.push({
+            x,
+            y,
+            t: Date.now() - startTime
+        });
+
+        // 画标记
+        const dot = document.createElement('div');
+        dot.className = 'click-dot';
+        dot.textContent = clicks.length;
+        const r = imgEl.getBoundingClientRect();
+        const boxR = boxEl.getBoundingClientRect();
+        dot.style.left = (e.clientX - boxR.left) + 'px';
+        dot.style.top = (e.clientY - boxR.top) + 'px';
+        clickLayer.appendChild(dot);
+
+        const need = current.extra.targetCount || 3;
+        if (clicks.length >= need) {
+            submitBehavior(clicks.map(c => c.x + ',' + c.y).join(';'));
+        }
+    }
+
+    /* ---------------- 提交 ---------------- */
+
+    async function submitBehavior(answer) {
+        if (!current) return;
+        const duration = Date.now() - startTime;
+        // 原样上报真实轨迹。不要为了"看起来更像人"去补点——
+        // 造假数据只会污染样本，也会掩盖前端采集本身的缺失。
+        const points = trajectory.slice();
+
+        setStatus('校验中…', 'info');
+        try {
+            const resp = await fetch('/captcha/validate/behavior', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    id: current.id,
+                    answer: answer,
+                    points: points,
+                    duration: Math.max(duration, 1)
+                })
+            });
+            const data = await resp.json();
+            if (data.valid) {
+                setStatus('校验通过 ✓（' + data.detail + '）', 'ok');
+            } else {
+                setStatus('校验失败：' + data.reason + ' · ' + data.detail, 'err');
+                setTimeout(refresh, 1200);
+            }
+        } catch (e) {
+            setStatus('请求失败：' + e.message, 'err');
+        }
+    }
+
+    async function submit() {
+        if (isBehavior()) {
+            return; // 行为类型自动提交
+        }
+        if (!current) {
+            setStatus('还没有验证码，请先刷新', 'err');
+            return;
+        }
+        const answer = answerEl.value.trim();
+        if (!answer) {
+            setStatus('请输入验证码', 'err');
+            return;
+        }
+        setStatus('校验中…', 'info');
+        try {
+            const resp = await fetch('/captcha/validate', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({id: current.id, answer: answer})
+            });
+            const data = await resp.json();
+            if (data.valid) {
+                setStatus('校验通过 ✓（该验证码已失效）', 'ok');
+                setTimeout(refresh, 900);
+            } else {
+                setStatus('校验失败：' + data.reason + ' · ' + data.detail, 'err');
+                refresh();
+            }
+        } catch (e) {
+            setStatus('请求失败：' + e.message, 'err');
+        }
+    }
+
+    imgEl.addEventListener('click', () => {
+        if (!isBehavior()) refresh();
+    });
+    typeEl.addEventListener('change', refresh);
+    answerEl.addEventListener('keydown', e => {
+        if (e.key === 'Enter') submit();
+    });
+
+    refresh();
+</script>
+</body>
+</html>

@@ -1,19 +1,43 @@
+server:
+  port: 8080
+
 spring:
   application:
     name: easy-captcha-demo
 
-  data:
-    redis:
-      host: 127.0.0.1
-      port: 6379
-
-# 验证码相关配置
+# 验证码配置
 easy-captcha:
   enabled: true
+  captcha-type: arithmetic_captcha
   width: 200
   height: 50
-  captcha-type: arithmetic_captcha
   captcha-length: 4
   char-type: default
   font: actionj
   difficulty: easy
+  ttl: 2m
+  max-entries: 10000
+  rate-limit-permits: 60
+  rate-limit-window: 1m
+
+  # 滑块拼图专用尺寸（比其他类型大，块和凸舌才看得清）
+  slider-width: 420
+  slider-height: 210
+
+  # 行为验证阈值（默认宽容档，避免误杀真人）
+  slider-tolerance: 8
+  click-tolerance: 18
+  behavior:
+    drag:
+      min-duration-ms: 0        # 0 = 不设下限
+      max-duration-ms: 300000
+      min-points: 1
+      monotonic-tolerance: 60
+      check-curvature: false
+    click:
+      min-duration-ms: 0
+      max-duration-ms: 300000
+
+logging:
+  level:
+    io.github.lucky845: INFO

@@ -7,7 +7,10 @@ import lombok.Getter;
 import java.awt.*;
 
 /**
- * 颜色枚举类，用于定义验证码的常用颜色。
+ * 验证码常用颜色枚举。
+ *
+ * <p>只保留在白底上可读的深色，避免出现黄色、亮绿色这类对比度过低、
+ * 用户肉眼难以辨认的颜色。
  *
  * @author created by lucky845 on 2025-01-16
  */
@@ -15,28 +18,39 @@ import java.awt.*;
 @AllArgsConstructor
 public enum ColorEnum {
 
-    RED(new int[]{255, 0, 0}), // 红色
-    BLUE(new int[]{0, 0, 255}), // 蓝色
-    GREEN(new int[]{0, 255, 0}), // 绿色
-    BLACK(new int[]{0, 0, 0}), // 黑色
-    GRAY(new int[]{128, 128, 128}), // 灰色
-    ORANGE(new int[]{255, 165, 0}), // 橙色
-    PURPLE(new int[]{128, 0, 128}), // 紫色
-    YELLOW(new int[]{255, 255, 0}), // 黄色
+    RED(200, 0, 0),
+    BLUE(0, 0, 200),
+    GREEN(0, 140, 0),
+    BLACK(0, 0, 0),
+    DARK_GRAY(70, 70, 70),
+    ORANGE(200, 110, 0),
+    PURPLE(110, 0, 140),
+    TEAL(0, 110, 110),
     ;
 
-    /**
-     * RGB颜色
-     */
-    private final int[] colors;
+    private final int red;
+    private final int green;
+    private final int blue;
 
     /**
-     * 返回随机颜色
+     * 返回一个随机的深色。
+     *
+     * @return 随机颜色
      */
-    public static Color getRandomColor() {
-        ColorEnum[] values = values();
-        ColorEnum colorEnum = values[RandomUtils.num(values.length)];
-        return new Color(colorEnum.getColors()[0], colorEnum.getColors()[1], colorEnum.getColors()[2]);
+    public static Color randomColor() {
+        ColorEnum colorEnum = RandomUtils.pick(values());
+        return new Color(colorEnum.red, colorEnum.green, colorEnum.blue);
     }
 
+    /**
+     * 返回一个随机的浅色，用于干扰元素，保证不会盖住字符。
+     *
+     * @return 随机浅色
+     */
+    public static Color randomLightColor() {
+        int r = RandomUtils.nextIntInclusive(140, 230);
+        int g = RandomUtils.nextIntInclusive(140, 230);
+        int b = RandomUtils.nextIntInclusive(140, 230);
+        return new Color(r, g, b);
+    }
 }
