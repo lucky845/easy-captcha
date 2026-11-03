@@ -513,8 +513,21 @@
                         <extensions>true</extensions>
                         <configuration>
                             <publishingServerId>${server.id.value}</publishingServerId>
-                            <autoPublish>true</autoPublish>
+                            <!--
+                                首版发布建议先手动确认：设为 false 后，
+                                mvn deploy 只上传到 staging，需到 Central Portal 检查
+                                产物齐全再点 Publish。确认无误后可改回 true。
+                            -->
+                            <autoPublish>false</autoPublish>
                             <checksums>required</checksums>
+                            <!--
+                                demo 只是示例工程，不应该出现在 Central 上。
+                                注意 maven.deploy.skip=true 对 central-publishing-plugin
+                                无效（它不走标准 deploy 流程），必须在这里显式排除。
+                            -->
+                            <excludeArtifacts>
+                                <artifact>easy-captcha-demo</artifact>
+                            </excludeArtifacts>
                         </configuration>
                     </plugin>
 
