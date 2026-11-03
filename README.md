@@ -433,6 +433,21 @@ mvn clean install    # 构建并安装
 - Java 21+
 - Spring Boot 3.x（仅 starter 模块需要）
 
+## 关于依赖告警
+
+GitHub Dependabot 会在这个仓库报出若干依赖漏洞告警。需要说明的是：
+
+- **告警全部来自 `easy-captcha-demo` 模块的传递依赖**（`tomcat-embed-core`、
+  `spring-webmvc`、`jackson-databind`、`netty` 等），因为 demo 是一个完整的
+  Spring Boot Web 示例工程。
+- **`easy-captcha-core` 与 `easy-captcha-spring-boot-starter` 本身依赖很干净**：
+  core 只依赖 `java.desktop`，starter 只依赖 `spring-boot-autoconfigure`。
+- 引入本库不会把 demo 的依赖带进你的项目——`easy-captcha-demo` 已设置
+  `maven.deploy.skip=true`，不参与发布。
+
+如果你需要部署 demo，请自行把 Spring Boot 升到最新补丁版，
+或直接用 `mvn dependency:tree` 排查后再上线。
+
 ## 许可证
 
 [Apache License 2.0](LICENSE)
