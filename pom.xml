@@ -75,7 +75,7 @@
         <lombok.version>1.18.46</lombok.version>
 
         <!-- 安全修复：覆盖 BOM 中滞后的传递依赖版本 -->
-        <tomcat.version>10.1.59</tomcat.version>
+        <tomcat.version>10.1.61</tomcat.version>
         <jackson.version>2.21.7</jackson.version>
         <log4j.version>2.25.5</log4j.version>
     </properties>
