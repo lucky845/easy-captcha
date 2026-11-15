@@ -8,7 +8,7 @@
 [![Java](https://img.shields.io/badge/Java-21+-orange?logo=openjdk&logoColor=white)](https://openjdk.org/)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.x-6DB33F?logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
-[![Tests](https://img.shields.io/badge/tests-143%20passed-brightgreen)]()
+[![Tests](https://img.shields.io/badge/tests-149%20passed-brightgreen)]()
 
 [快速开始](#快速开始) · [验证码类型](#验证码类型) · [配置](#配置) · [核心 API](#核心-api) · [更新日志](CHANGELOG.md) · [示例](#运行示例)
 
@@ -343,7 +343,7 @@ java -jar easy-captcha-demo/target/easy-captcha-demo.jar
 ## 构建与测试
 
 ```bash
-mvn clean test       # 127 个测试
+mvn clean test       # 149 个测试
 mvn clean install    # 安装到本地仓库
 ```
 
@@ -358,6 +358,7 @@ mvn clean install    # 安装到本地仓库
 | `BehaviorConfigurationTest` | 11 | 阈值配置生效、默认宽容档 |
 | `InMemoryCaptchaStoreTest` | 7 | TTL、容量、边界 |
 | `RedisCaptchaStoreTest` | 11 | 序列化往返、GETDEL 一次性、TTL、损坏数据 |
+| `RedisCaptchaPipelineTest` | 6 | Redis 往返后校验、跨实例签发校验、并发抢票 |
 | `CaptchaStoreAutoconfigurationTest` | 5 | 有/无 Redis 时的存储选择、自定义覆盖 |
 | `DemoControllerTest` | 15 | HTTP 全链路、答案不泄露 |
 
@@ -377,6 +378,8 @@ GitHub Dependabot 会报出若干告警，需要说明的是：
 ## 贡献
 
 欢迎 Issue 与 Pull Request。提交前请确认 `mvn clean test` 全绿。
+
+维护者发布新版本前请先读 [RELEASING.md](RELEASING.md)——尤其是 Maven Central **每月发布次数上限（约 7 次/组织）** 那一段，超限会进 30 天宽限期。
 
 ## 许可证
 
