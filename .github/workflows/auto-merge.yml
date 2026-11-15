@@ -14,6 +14,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # master 要求「分支必须最新」，dependabot 自己不会主动 rebase 没有冲突的分支。
+      # 落后于 base 时先把它更新上来，否则 auto-merge 会一直卡在 BEHIND。
+      # 已是最新时该命令返回非零，直接放过。
+      - name: Update branch if behind
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+        run: gh pr update-branch "$PR_URL" || true
+
       # 打开 GitHub 的 auto-merge 开关。它本身不绕过任何保护规则：
       # 分支保护要求的 CI 与 review 仍然必须满足，只是满足后自动合并。
       - name: Enable auto-merge
