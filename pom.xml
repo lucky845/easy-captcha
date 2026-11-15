@@ -72,7 +72,7 @@
             必须显式给版本，因此这里保留一个与 BOM 对齐的值。
         -->
         <spring-boot.version>3.5.16</spring-boot.version>
-        <lombok.version>1.18.46</lombok.version>
+        <lombok.version>1.18.48</lombok.version>
 
         <!-- 安全修复：覆盖 BOM 中滞后的传递依赖版本 -->
         <tomcat.version>10.1.59</tomcat.version>
