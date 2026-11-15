@@ -17,7 +17,7 @@ jobs:
 
       # 🔧 精准缓存策略
       - name: Cache Maven dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('pom.xml') }}
@@ -68,13 +68,6 @@ jobs:
       #            -Dsonar.organization=github-organization
       #            -Dsonar.sources=src/main/java
 
-      # ⚠️ 强制失败检查
-      - name: Check build status
-        run: |
-          if [ $? -ne 0 ]; then
-            echo "::error::Build failed. Check logs for details"
-            exit 1
-          fi
 
   # 🚀 快速合并（可选集成）
 #  auto-merge:
