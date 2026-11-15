@@ -76,7 +76,7 @@
 
         <!-- 安全修复：覆盖 BOM 中滞后的传递依赖版本 -->
         <tomcat.version>10.1.61</tomcat.version>
-        <jackson.version>2.22.4</jackson.version>
+        <jackson.version>2.23.0</jackson.version>
         <log4j.version>2.26.1</log4j.version>
     </properties>
 
