@@ -6,19 +6,18 @@ on:
 
 jobs:
   automerge:
+    # 只处理 dependabot 自己开的 PR，避免影响人工提交
+    if: github.actor == 'dependabot[bot]'
     permissions:
-      contents: read
+      contents: write
       pull-requests: write
     runs-on: ubuntu-latest
-    if: contains(join(github.event.pull_request.labels.*.name, ','), 'dependencies')
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
 
-      - name: Enable Auto-Merge
-        if: steps.create-pr.outputs.pull-request-number != ''
-        uses: peter-evans/enable-pull-request-automerge@v2
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          pull-request-number: ${{ steps.create-pr.outputs.pull-request-number }}
-          merge-method: squash
+    steps:
+      # 打开 GitHub 的 auto-merge 开关。它本身不绕过任何保护规则：
+      # 分支保护要求的 CI 与 review 仍然必须满足，只是满足后自动合并。
+      - name: Enable auto-merge
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+        run: gh pr merge --auto --squash --delete-branch "$PR_URL"
