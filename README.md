@@ -9,10 +9,17 @@
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.x-6DB33F?logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![Tests](https://img.shields.io/badge/tests-149%20passed-brightgreen)]()
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen)](LICENSE)
 
 [快速开始](#快速开始) · [验证码类型](#验证码类型) · [配置](#配置) · [核心 API](#核心-api) · [更新日志](CHANGELOG.md) · [示例](#运行示例)
 
 </div>
+
+> [!NOTE]
+> **零运行时依赖、答案不出服务端。** 核心只依赖 `java.desktop`，下发给浏览器的只有图片与提示，答案始终留在服务端。
+
+> [!IMPORTANT]
+> 行为验证码（滑块 / 点选）的答案是几何信息，由前端回传轨迹、后端按容差判定 —— 不是不可逆的「绝对安全」，请按业务风险选择合适的校验档位。
 
 ---
 
@@ -36,6 +43,7 @@
 | **滑块拼图** | `SLIDER_CAPTCHA` | **拖动** | 拼图轮廓挖孔，含假缺口干扰 |
 | **文字点选** | `CLICK_WORD_CAPTCHA` | **点击** | 按提示顺序点字，坐标即答案 |
 
+> [!TIP]
 > 前 5 种是静态图片；后 2 种是**行为验证码**，答案是几何信息，由前端回传轨迹、后端按容差判定，OCR 打码对它无效。
 
 ## 快速开始
